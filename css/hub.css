@@ -618,7 +618,7 @@ select {
   .pi-dot-m{display:inline-block;font-size:11px;background:var(--white);border:1px solid;border-radius:12px;padding:2px 7px;margin:2px;white-space:nowrap}
 
   /* Modal */
-  .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center}
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
   .modal-bg.open{display:flex}
   .modal{background:var(--white);border-radius:var(--r);padding:24px;width:580px;max-width:96vw;box-shadow:0 8px 40px rgba(0,0,0,.18);max-height:90vh;overflow-y:auto}
   .modal h3{font-size:15px;font-weight:600;margin-bottom:16px}
@@ -968,3 +968,102 @@ select {
 
 /* Transições seletivas — apenas nos componentes necessários */
 .nav-dot, .status-dot { transition: background 160ms; }
+
+/* ── Dark mode fixes adicionais ── */
+[data-theme="dark"] .modal-bg { background: rgba(0,0,0,.75); }
+[data-theme="dark"] .modal { background: #1C2128; border: 1px solid #30363D; }
+[data-theme="dark"] .modal h3 { color: #E6EDF3; }
+[data-theme="dark"] .help-modal-bg { background: rgba(0,0,0,.75); }
+[data-theme="dark"] .help-modal { background: #1C2128; border: 1px solid #30363D; }
+
+/* PI cards no dark mode */
+[data-theme="dark"] .pi-card { background: #1C2128; border-color: #30363D; }
+[data-theme="dark"] .pi-nm { color: #E6EDF3 !important; }
+[data-theme="dark"] .pi-nr { color: #8B949E !important; }
+[data-theme="dark"] .pi-tags span { background: #21262D !important; color: #B1BAC4 !important; }
+
+/* Select options no dark mode — remove emojis problemáticos */
+[data-theme="dark"] select option { background: #1C2128; color: #C9D1D9; }
+
+/* Caráter select no dark mode */
+[data-theme="dark"] select { 
+  color: #C9D1D9; 
+  background-color: #161B22;
+}
+
+/* SWOT no dark mode */
+[data-theme="dark"] .sw-q { background: #1C2128 !important; border-color: #30363D !important; }
+[data-theme="dark"] .sq-t { color: #8B949E !important; }
+[data-theme="dark"] .sq-i { color: #E6EDF3 !important; }
+
+/* Sidebar ativa — verde petróleo bonito */
+.nav-item.on {
+  background: linear-gradient(90deg, rgba(15,118,110,.12) 0%, rgba(15,118,110,.05) 100%);
+  color: #0D5F5A;
+  border-left: 2px solid #0F766E;
+  font-weight: 600;
+}
+.nav-item.on .nav-dot { 
+  background: #0F766E;
+  box-shadow: 0 0 0 3px rgba(15,118,110,.2);
+}
+.nav-item.on .nav-cl {
+  background: #CCFBF1;
+  color: #0D5F5A;
+  border-color: #5EEAD4;
+  font-weight: 700;
+}
+
+/* Hover mais refinado */
+.nav-item:hover {
+  background: rgba(15,118,110,.06);
+  color: #0D5F5A;
+  border-left-color: rgba(15,118,110,.3);
+}
+
+/* Dark mode sidebar */
+[data-theme="dark"] .nav-item.on {
+  background: linear-gradient(90deg, rgba(45,212,191,.15) 0%, rgba(45,212,191,.05) 100%);
+  color: #2DD4BF;
+  border-left-color: #2DD4BF;
+}
+[data-theme="dark"] .nav-item.on .nav-dot {
+  background: #2DD4BF;
+  box-shadow: 0 0 0 3px rgba(45,212,191,.2);
+}
+[data-theme="dark"] .nav-item.on .nav-cl {
+  background: #042F2E;
+  color: #2DD4BF;
+  border-color: #0D9488;
+}
+[data-theme="dark"] .nav-item:hover {
+  background: rgba(45,212,191,.08);
+  color: #2DD4BF;
+}
+
+/* Chips de sugestão no dark mode */
+[data-theme="dark"] .sugg { 
+  background: #21262D !important; 
+  border-color: #30363D !important; 
+  color: #C9D1D9 !important; 
+}
+
+/* Info boxes no dark mode */
+[data-theme="dark"] .info { 
+  background: #0C1A2E !important; 
+  color: #79C0FF !important; 
+  border-color: #2563EB !important;
+}
+[data-theme="dark"] .info.green { 
+  background: #042F2E !important; 
+  color: #2DD4BF !important; 
+  border-color: #0D9488 !important;
+}
+[data-theme="dark"] .info.amber { 
+  background: #2D1B00 !important; 
+  color: #F2CC60 !important; 
+  border-color: #E3B341 !important;
+}
+
+/* Texto da legenda da SWOT no dark mode */
+[data-theme="dark"] .sw-leg { color: #8B949E !important; }
