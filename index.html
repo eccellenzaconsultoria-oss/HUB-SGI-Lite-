@@ -9,50 +9,58 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --green:     #0F766E;
-  --green-d:   #0D5F5A;
-  --green-l:   #CCFBF1;
-  --green-xl:  #F0FDFA;
-  --green-text:#134E4A;
-  --teal:      #0D9488;
-  --teal-d:    #0F766E;
-  --gray-900:  #111827;
-  --gray-800:  #1F2937;
-  --gray-700:  #374151;
-  --gray-600:  #4B5563;
-  --gray-500:  #6B7280;
-  --gray-400:  #9CA3AF;
-  --gray-300:  #D1D5DB;
-  --gray-200:  #E5E7EB;
-  --gray-100:  #F3F4F6;
-  --gray-050:  #F9FAFB;
-  --white:     #FFFFFF;
-  --amber-600: #D97706;
-  --amber-100: #FEF3C7;
-  --slate-400: #94A3B8;
-  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --gold:       #C9A45C;
+  --gold-soft:  #E7D3A1;
+  --gold-light: #D8C29A;
+  --brand-dark: #140D09;
+  --taupe:      #776B5C;
+  --bg:         #F4F1EC;
+  --bg-soft:    #EDE7DF;
+  --card:       #FCFAF7;
+  --card-2:     #F7F1E8;
+  --text:       #140D09;
+  --text-soft:  #776B5C;
+  --text-muted: #9A8F84;
+  --border:     rgba(119,107,92,.18);
+  --shadow:     0 4px 18px rgba(20,13,9,.08);
+  --shadow-sm:  0 1px 3px rgba(20,13,9,.06);
+  --nav-active: rgba(201,164,92,.20);
+  --nav-pill:   rgba(201,164,92,.55);
+  --font: 'Inter', -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --r: 12px;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
-  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.05);
-  --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 8px 32px rgba(0,0,0,.06);
+}
+[data-theme="dark"] {
+  --bg:         #140D09;
+  --bg-soft:    #1E1511;
+  --card:       #241B16;
+  --card-2:     #2A211C;
+  --text:       #F4EFE8;
+  --text-soft:  #C8B9A8;
+  --text-muted: #A58F7A;
+  --border:     rgba(231,211,161,.18);
+  --shadow:     0 4px 18px rgba(0,0,0,.26);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.20);
+  --nav-active: rgba(201,164,92,.18);
+  --nav-pill:   rgba(231,211,161,.60);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
   font-family: var(--font);
-  background: var(--white);
-  color: var(--gray-800);
+  background: var(--bg);
+  color: var(--text);
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  transition: background .25s, color .25s;
 }
 
-/* ── TOPBAR ────────────────────────────────────────────────────── */
+/* ── TOPBAR ──────────────────────────────────────────── */
 .topbar {
   height: 56px;
-  background: var(--white);
-  border-bottom: 1px solid var(--gray-200);
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -60,460 +68,235 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: var(--shadow-sm);
 }
-
-.topbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-}
-
+.topbar-brand { display:flex; align-items:center; gap:10px; text-decoration:none; }
 .brand-mark {
   width: 30px; height: 30px;
-  background: var(--gray-900);
+  background: var(--gold);
   border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
 }
-
-.brand-name {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--gray-900);
-  letter-spacing: -.02em;
-}
-
-.brand-version {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--gray-400);
-  margin-left: 2px;
-  font-weight: 400;
-}
-
-.topbar-nav {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
+.brand-name { font-size:15px; font-weight:700; color:var(--text); letter-spacing:-.02em; }
+.brand-version { font-family:var(--font-mono); font-size:10px; color:var(--text-muted); margin-left:2px; }
+.topbar-nav { display:flex; align-items:center; gap:6px; }
 .topbar-link {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--gray-600);
-  text-decoration: none;
-  padding: 5px 12px;
-  border-radius: 8px;
-  transition: all 140ms;
-  display: flex; align-items: center; gap: 5px;
+  font-size:13px; font-weight:500; color:var(--text-soft);
+  text-decoration:none; padding:5px 12px; border-radius:8px;
+  transition: all 140ms; display:flex; align-items:center; gap:5px;
 }
-.topbar-link:hover { background: var(--gray-100); color: var(--gray-900); }
-
+.topbar-link:hover { background:var(--bg-soft); color:var(--text); }
 .topbar-avatar {
-  width: 32px; height: 32px;
-  background: var(--green-l);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 600;
-  color: var(--green-text);
-  cursor: pointer;
+  width:32px; height:32px;
+  background: var(--nav-active);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:600;
+  color:var(--gold); cursor:pointer;
+  border: 1px solid var(--nav-pill);
 }
 
-/* ── HERO ──────────────────────────────────────────────────────── */
+/* ── HERO ────────────────────────────────────────────── */
 .hero {
   position: relative;
-  background: var(--white);
+  background: var(--card);
   overflow: hidden;
   padding: 64px 48px 56px;
+  border-bottom: 1px solid var(--border);
 }
-
-/* Textura de fundo sutil */
 .hero::before {
   content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 80% 20%, rgba(16,185,129,.06) 0%, transparent 50%),
-    radial-gradient(circle at 20% 80%, rgba(13,148,136,.05) 0%, transparent 50%);
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 80% 20%, rgba(201,164,92,.08) 0%, transparent 55%),
+    radial-gradient(circle at 15% 75%, rgba(119,107,92,.06) 0%, transparent 55%);
   pointer-events: none;
 }
-
-/* Grade de pontos sutil */
 .hero::after {
   content: '';
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(var(--gray-300) 1px, transparent 1px);
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(119,107,92,.15) 1px, transparent 1px);
   background-size: 28px 28px;
-  opacity: .35;
+  opacity: .3;
   pointer-events: none;
 }
-
-.hero-inner {
-  position: relative;
-  z-index: 1;
-  max-width: 680px;
-}
-
+.hero-inner { position:relative; z-index:1; max-width:680px; }
 .hero-title {
-  font-size: clamp(36px, 5vw, 52px);
+  font-size: clamp(36px,5vw,52px);
   font-weight: 800;
   line-height: 1.08;
   letter-spacing: -.04em;
-  color: var(--gray-900);
+  color: var(--text);
   margin-bottom: 18px;
 }
-
-.hero-title-accent {
-  color: var(--green);
-  display: inline;
-}
-
-.hero-sub {
-  font-size: 15px;
-  color: var(--gray-500);
-  line-height: 1.7;
-  max-width: 520px;
-  margin-bottom: 28px;
-}
-
-.hero-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
+.hero-title-accent { color: var(--gold); }
+.hero-sub { font-size:15px; color:var(--text-soft); line-height:1.7; max-width:520px; margin-bottom:28px; }
+.hero-actions { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
 .btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--green);
-  color: #fff;
-  font-size: 13.5px;
-  font-weight: 600;
-  padding: 9px 18px;
-  border-radius: 9px;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  transition: background 140ms;
-  font-family: var(--font);
+  display:inline-flex; align-items:center; gap:6px;
+  background: var(--gold); color: var(--brand-dark);
+  font-size:13.5px; font-weight:600;
+  padding:9px 18px; border-radius:9px;
+  text-decoration:none; border:none; cursor:pointer;
+  transition: opacity 140ms; font-family:var(--font);
 }
-.btn-primary:hover { background: var(--green-d); }
-
+.btn-primary:hover { opacity: .88; }
 .btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--white);
-  color: var(--gray-700);
-  font-size: 13.5px;
-  font-weight: 500;
-  padding: 9px 18px;
-  border-radius: 9px;
-  text-decoration: none;
-  border: 1px solid var(--gray-200);
-  cursor: pointer;
-  transition: all 140ms;
-  font-family: var(--font);
+  display:inline-flex; align-items:center; gap:6px;
+  background: var(--card-2); color:var(--text-soft);
+  font-size:13.5px; font-weight:500;
+  padding:9px 18px; border-radius:9px;
+  text-decoration:none; border:1px solid var(--border);
+  cursor:pointer; transition:all 140ms; font-family:var(--font);
 }
-.btn-secondary:hover { background: var(--gray-050); border-color: var(--gray-300); }
+.btn-secondary:hover { background:var(--bg-soft); color:var(--text); }
 
-/* ── MÓDULOS ───────────────────────────────────────────────────── */
-.modules-section {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 40px 48px 64px;
-}
-
+/* ── MÓDULOS ─────────────────────────────────────────── */
+.modules-section { max-width:1280px; margin:0 auto; padding:40px 48px 64px; }
 .modules-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 12px;
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:20px; flex-wrap:wrap; gap:12px;
 }
-
-.modules-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--gray-900);
-  letter-spacing: -.02em;
-}
-
-.modules-sub {
-  font-size: 13px;
-  color: var(--gray-500);
-  margin-top: 2px;
-}
-
-/* Filtros */
+.modules-title { font-size:16px; font-weight:700; color:var(--text); letter-spacing:-.02em; }
+.modules-sub { font-size:13px; color:var(--text-muted); margin-top:2px; }
 .filters {
-  display: flex;
-  gap: 4px;
-  background: var(--gray-100);
-  padding: 3px;
-  border-radius: 9px;
+  display:flex; gap:4px;
+  background: var(--bg-soft); padding:3px; border-radius:9px;
 }
-
 .filter-btn {
-  font-size: 12px;
-  font-weight: 500;
-  padding: 5px 14px;
-  border-radius: 7px;
-  border: none;
-  background: transparent;
-  color: var(--gray-500);
-  cursor: pointer;
-  transition: all 140ms;
-  font-family: var(--font);
+  font-size:12px; font-weight:500; padding:5px 14px;
+  border-radius:7px; border:none; background:transparent;
+  color:var(--text-muted); cursor:pointer; transition:all 140ms;
+  font-family:var(--font);
 }
-
 .filter-btn.active {
-  background: var(--white);
-  color: var(--gray-900);
-  box-shadow: var(--shadow-sm);
-  font-weight: 600;
+  background:var(--card); color:var(--text);
+  box-shadow:var(--shadow-sm); font-weight:600;
+  border: 1px solid var(--border);
 }
+.modules-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
 
-/* Grid */
-.modules-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-/* ── MODULE CARD ───────────────────────────────────────────────── */
+/* ── MODULE CARD ─────────────────────────────────────── */
 .module-card {
-  background: var(--white);
-  border: 1px solid var(--gray-200);
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: var(--r);
   padding: 20px;
-  text-decoration: none;
-  color: inherit;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  text-decoration:none; color:inherit;
+  display:flex; flex-direction:column; gap:0;
   transition: box-shadow 160ms, border-color 160ms, transform 160ms;
   box-shadow: var(--shadow-sm);
-  position: relative;
-  min-height: 220px;
+  position:relative; min-height:220px;
 }
-
 .module-card.ready:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--gray-300);
+  box-shadow: var(--shadow);
+  border-color: rgba(201,164,92,.45);
   transform: translateY(-2px);
 }
+.module-card.planned { opacity:.55; cursor:default; }
 
-.module-card.planned {
-  opacity: .6;
-  cursor: default;
-}
-
-/* Badge de status no canto superior direito */
 .card-status-badge {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  font-size: 10.5px;
-  font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 20px;
-  letter-spacing: .01em;
+  position:absolute; top:16px; right:16px;
+  font-size:10.5px; font-weight:600;
+  padding:3px 9px; border-radius:20px; letter-spacing:.01em;
 }
-.csb-ready    { background: var(--green-l); color: var(--green-text); }
-.csb-wip      { background: var(--amber-100); color: var(--amber-600); }
-.csb-planned  { background: var(--gray-100); color: var(--gray-500); }
+.csb-ready   { background:var(--nav-active); color:var(--gold); border:1px solid var(--nav-pill); }
+.csb-wip     { background:rgba(201,164,92,.10); color:#8C5E1A; border:1px solid rgba(201,164,92,.3); }
+.csb-planned { background:var(--bg-soft); color:var(--text-muted); border:1px solid var(--border); }
 
-/* Ícone do card */
 .card-icon {
-  width: 36px; height: 36px;
-  border-radius: 9px;
-  background: var(--gray-100);
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 12px;
-  flex-shrink: 0;
+  width:36px; height:36px; border-radius:9px;
+  background:var(--bg-soft);
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:12px; flex-shrink:0;
 }
-
-.module-card.ready .card-icon { background: var(--green-xl); }
-
-.card-icon svg { width: 18px; height: 18px; }
-.module-card.ready .card-icon svg  { stroke: var(--green-d); }
-.module-card.wip .card-icon   { background: var(--amber-100); }
-.module-card.wip .card-icon svg    { stroke: var(--amber-600); }
-.module-card.planned .card-icon svg{ stroke: var(--gray-400); }
+.module-card.ready .card-icon { background:var(--nav-active); }
+.card-icon svg { width:18px; height:18px; }
+.module-card.ready .card-icon svg { stroke:var(--gold); }
+.module-card.planned .card-icon svg { stroke:var(--text-muted); }
 
 .card-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--gray-900);
-  margin-bottom: 5px;
-  letter-spacing: -.01em;
-  line-height: 1.3;
-  padding-right: 70px; /* espaço para o badge */
+  font-size:14px; font-weight:700; color:var(--text);
+  margin-bottom:5px; letter-spacing:-.01em;
+  line-height:1.3; padding-right:70px;
 }
+.card-desc { font-size:12px; color:var(--text-muted); line-height:1.65; margin-bottom:14px; flex:1; }
 
-.card-desc {
-  font-size: 12px;
-  color: var(--gray-500);
-  line-height: 1.65;
-  margin-bottom: 14px;
-  flex: 1;
-}
-
-/* Clause tags */
-.card-clauses {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 14px;
-}
-
+.card-clauses { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:14px; }
 .clause {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  padding: 2px 7px;
-  border-radius: 4px;
-  border: 1px solid;
+  font-family:var(--font-mono); font-size:10px; font-weight:500;
+  padding:2px 7px; border-radius:4px; border:1px solid;
 }
+.c-env  { background:var(--nav-active); color:var(--gold); border-color:var(--nav-pill); }
+.c-sst  { background:var(--card-2); color:var(--text-soft); border-color:var(--border); }
+.c-both { background:var(--nav-active); color:var(--gold); border-color:var(--nav-pill); }
 
-.c-env  { background: var(--green-xl); color: var(--green-text); border-color: #99F6E4; }
-.c-sst  { background: #F0FDFA; color: var(--teal-d); border-color: #99F6E4; }
-.c-both { background: #F5F3FF; color: #5B21B6; border-color: #DDD6FE; }
-
-/* CTA do card */
 .card-cta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 14px;
-  border-top: 1px solid var(--gray-100);
-  margin-top: auto;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--green-text);
-  text-decoration: none;
+  display:flex; align-items:center; justify-content:space-between;
+  padding-top:14px; border-top:1px solid var(--border);
+  margin-top:auto; font-size:12.5px; font-weight:600;
+  color:var(--text-soft); text-decoration:none;
 }
-
-.card-cta.disabled {
-  color: var(--gray-400);
-}
-
+.card-cta.disabled { color:var(--text-muted); }
 .cta-arrow {
-  width: 26px; height: 26px;
-  border-radius: 7px;
-  background: var(--green);
-  display: flex; align-items: center; justify-content: center;
-  transition: background 140ms;
+  width:26px; height:26px; border-radius:7px;
+  background:var(--gold);
+  display:flex; align-items:center; justify-content:center;
 }
-
-.module-card.ready:hover .cta-arrow { background: var(--green-d); }
-
 .cta-arrow-planned {
-  width: 26px; height: 26px;
-  border-radius: 7px;
-  background: var(--gray-100);
-  display: flex; align-items: center; justify-content: center;
+  width:26px; height:26px; border-radius:7px;
+  background:var(--bg-soft);
+  display:flex; align-items:center; justify-content:center;
 }
 
-/* ── FOOTER ────────────────────────────────────────────────────── */
+/* ── FOOTER ──────────────────────────────────────────── */
 .site-footer {
-  border-top: 1px solid var(--gray-200);
-  padding: 20px 48px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
+  border-top:1px solid var(--border);
+  padding:20px 48px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap;
+  background:var(--card);
 }
-
-.footer-text {
-  font-size: 12px;
-  color: var(--gray-400);
-}
-
-.footer-norms {
-  display: flex;
-  gap: 8px;
-}
-
+.footer-text { font-size:12px; color:var(--text-muted); }
+.footer-norms { display:flex; gap:8px; }
 .footer-norm {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--gray-400);
-  background: var(--gray-100);
-  border: 1px solid var(--gray-200);
-  padding: 2px 8px;
-  border-radius: 4px;
+  font-family:var(--font-mono); font-size:10px;
+  color:var(--gold); background:var(--nav-active);
+  border:1px solid var(--nav-pill);
+  padding:2px 8px; border-radius:4px;
 }
 
-/* ── RESPONSIVE ────────────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  .modules-grid { grid-template-columns: repeat(2, 1fr); }
-  .hero, .modules-section { padding-left: 32px; padding-right: 32px; }
+/* Dark mode toggle */
+.dark-toggle {
+  width:32px; height:32px; border-radius:7px;
+  border:1px solid var(--border); background:var(--card);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--text-soft); transition:all 140ms;
 }
+.dark-toggle:hover { background:var(--bg-soft); color:var(--gold); }
+.dark-toggle .icon-sun  { display:none; }
+.dark-toggle .icon-moon { display:block; }
+[data-theme="dark"] .dark-toggle .icon-sun  { display:block; }
+[data-theme="dark"] .dark-toggle .icon-moon { display:none; }
 
-@media (max-width: 640px) {
-  .modules-grid { grid-template-columns: 1fr; }
-  .hero { padding: 40px 20px; }
-  .modules-section { padding: 24px 20px 40px; }
-  .hero-title { font-size: 32px; }
-  .topbar { padding: 0 20px; }
-}
-
-  /* Dark mode — index */
-  [data-theme="dark"] body { background: #0D1117; color: #C9D1D9; }
-  [data-theme="dark"] .topbar { background: #161B22; border-color: #30363D; }
-  [data-theme="dark"] .brand-name { color: #E6EDF3; }
-  [data-theme="dark"] .topbar-link { color: #8B949E; }
-  [data-theme="dark"] .topbar-link:hover { background: #21262D; color: #E6EDF3; }
-  [data-theme="dark"] .hero { background: #0D1117; }
-  [data-theme="dark"] .hero-title { color: #F0F6FC; }
-  [data-theme="dark"] .hero-sub { color: #8B949E; }
-  [data-theme="dark"] .btn-secondary { background: #21262D; border-color: #30363D; color: #C9D1D9; }
-  [data-theme="dark"] .btn-secondary:hover { background: #30363D; }
-  [data-theme="dark"] .modules-section { background: #0D1117; }
-  [data-theme="dark"] .modules-title { color: #F0F6FC; }
-  [data-theme="dark"] .modules-sub { color: #8B949E; }
-  [data-theme="dark"] .filters { background: #21262D; }
-  [data-theme="dark"] .filter-btn { color: #8B949E; }
-  [data-theme="dark"] .filter-btn.active { background: #30363D; color: #E6EDF3; }
-  [data-theme="dark"] .module-card { background: #161B22; border-color: #30363D; }
-  [data-theme="dark"] .module-card.ready:hover { border-color: #484F58; box-shadow: 0 4px 20px rgba(0,0,0,.4); }
-  [data-theme="dark"] .card-icon { background: #21262D; }
-  [data-theme="dark"] .module-card.ready .card-icon { background: #042F2E; }
-  [data-theme="dark"] .card-title { color: #E6EDF3; }
-  [data-theme="dark"] .card-desc { color: #8B949E; }
-  [data-theme="dark"] .c-env { background: #042F2E; color: #2DD4BF; border-color: #0D9488; }
-  [data-theme="dark"] .c-sst { background: #0D2D29; color: #2DD4BF; border-color: #0D9488; }
-  [data-theme="dark"] .c-both { background: #1A0D3A; color: #D2A8FF; border-color: #7C3AED; }
-  [data-theme="dark"] .card-cta { border-color: #21262D; color: #2DD4BF; }
-  [data-theme="dark"] .cta-arrow-planned { background: #21262D; }
-  [data-theme="dark"] .site-footer { border-color: #30363D; }
-  [data-theme="dark"] .footer-text { color: #6E7681; }
-  [data-theme="dark"] .footer-norm { background: #21262D; border-color: #30363D; color: #6E7681; }
-  [data-theme="dark"] .dark-toggle { background: #21262D; border-color: #30363D; color: #8B949E; }
-  [data-theme="dark"] .dark-toggle:hover { background: #30363D; color: #C9D1D9; }
+/* Responsive */
+@media(max-width:1024px) { .modules-grid{grid-template-columns:repeat(2,1fr);} .hero,.modules-section{padding-left:32px;padding-right:32px;} }
+@media(max-width:640px)  { .modules-grid{grid-template-columns:1fr;} .hero{padding:40px 20px;} .modules-section{padding:24px 20px 40px;} .hero-title{font-size:32px;} .topbar{padding:0 20px;} }
 </style>
 
 <script>
-// Dark mode — inicializa antes do render
-(function() {
-  try {
-    var s = localStorage.getItem('sgi-theme');
-    var d = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.setAttribute('data-theme', s || (d ? 'dark' : 'light'));
-  } catch(e) {}
+(function(){
+  try{
+    var s=localStorage.getItem('sgi-theme');
+    var d=window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme',s||(d?'dark':'light'));
+  }catch(e){}
 })();
-window.toggleDarkMode = function() {
-  var r = document.documentElement;
-  var t = r.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  r.setAttribute('data-theme', t);
-  try { localStorage.setItem('sgi-theme', t); } catch(e) {}
+window.toggleDarkMode=function(){
+  var r=document.documentElement;
+  var t=r.getAttribute('data-theme')==='dark'?'light':'dark';
+  r.setAttribute('data-theme',t);
+  try{localStorage.setItem('sgi-theme',t);}catch(e){}
 };
 </script>
 </head>
@@ -606,8 +389,8 @@ window.toggleDarkMode = function() {
           <path d="M3 9h18M9 21V9"/>
         </svg>
       </div>
-      <div class="card-title">Contexto da Organização</div>
-      <div class="card-desc">Análise SWOT, Partes Interessadas, parâmetros organizacionais, Mudanças Climáticas de forma integrada e assistida por inteligência técnica.</div>
+      <div class="card-title">Sistema de Gestão</div>
+      <div class="card-desc">Contexto, partes interessadas, aspectos & perigos, riscos & oportunidades, objetivos, indicadores e análise crítica do SGI — 9 cláusulas integradas.</div>
       <div class="card-clauses">
         <span class="clause c-both">ISO 14001</span>
         <span class="clause c-both">ISO 45001</span>
@@ -623,141 +406,8 @@ window.toggleDarkMode = function() {
       </div>
     </a>
 
-    <!-- Liderança e Participação (futuro) -->
-    <a href="#" class="module-card planned" data-cat="norm" onclick="return false">
-      <span class="card-status-badge csb-planned">Em breve</span>
-      <div class="card-icon">
-        <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
-      </div>
-      <div class="card-title">Liderança e Participação</div>
-      <div class="card-desc">Definição de políticas integradas, papéis organizacionais, responsabilidades e consulta ativa dos trabalhadores.</div>
-      <div class="card-clauses">
-        <span class="clause c-both">ISO 14001</span>
-        <span class="clause c-both">ISO 45001</span>
-        <span class="clause c-sst">Cláusula 5</span>
-      </div>
-      <div class="card-cta disabled">
-        Indisponível no momento
-        <div class="cta-arrow-planned">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </div>
-      </div>
-    </a>
 
-    <!-- Planejamento -->
-    <a href="#" class="module-card ready" data-cat="norm" onclick="alert('Em breve!');return false">
-      <span class="card-status-badge csb-ready">Disponível</span>
-      <div class="card-icon">
-        <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M12 8v4l3 3"/>
-        </svg>
-      </div>
-      <div class="card-title">Planejamento (Riscos e Oportunidades)</div>
-      <div class="card-desc">Identificação de aspectos ambientais, perigos de SST, requisitos legais e definição de objetivos estratégicos do SGI.</div>
-      <div class="card-clauses">
-        <span class="clause c-both">ISO 14001</span>
-        <span class="clause c-both">ISO 45001</span>
-        <span class="clause c-env">Cláusula 6</span>
-      </div>
-      <div class="card-cta">
-        Acessar Módulo
-        <div class="cta-arrow">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </div>
-      </div>
-    </a>
-
-    <!-- Apoio e Recursos -->
-    <a href="#" class="module-card planned" data-cat="env" onclick="return false">
-      <span class="card-status-badge csb-planned">Em breve</span>
-      <div class="card-icon">
-        <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24">
-          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-        </svg>
-      </div>
-      <div class="card-title">Apoio e Recursos</div>
-      <div class="card-desc">Gestão de competências, treinamentos, comunicação interdepartamental e controle de informação documentada.</div>
-      <div class="card-clauses">
-        <span class="clause c-both">ISO 14001</span>
-        <span class="clause c-both">ISO 45001</span>
-        <span class="clause c-sst">Cláusula 7</span>
-      </div>
-      <div class="card-cta disabled">
-        Indisponível no momento
-        <div class="cta-arrow-planned">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </div>
-      </div>
-    </a>
-
-    <!-- Operação e MOC -->
-    <a href="modulos/gmud.html" class="module-card ready" data-cat="env">
-      <span class="card-status-badge csb-ready">Disponível</span>
-      <div class="card-icon">
-        <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24">
-          <polyline points="17 1 21 5 17 9"/>
-          <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-          <polyline points="7 23 3 19 7 15"/>
-          <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-        </svg>
-      </div>
-      <div class="card-title">GMUD — Gestão de Mudanças</div>
-      <div class="card-desc">Gestão estruturada de mudanças com triagem de impactos, plano de ação automático, aprovações e relatório de evidência para auditoria.</div>
-      <div class="card-clauses">
-        <span class="clause c-both">ISO 14001</span>
-        <span class="clause c-both">ISO 45001</span>
-        <span class="clause c-both">8.1.3 GMUD</span>
-      </div>
-      <div class="card-cta">
-        Acessar Módulo
-        <div class="cta-arrow">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </div>
-      </div>
-    </a>
-
-    <!-- Avaliação de Desempenho -->
-    <a href="#" class="module-card planned" data-cat="norm" onclick="return false">
-      <span class="card-status-badge csb-planned">Em breve</span>
-      <div class="card-icon">
-        <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24">
-          <line x1="18" y1="20" x2="18" y2="10"/>
-          <line x1="12" y1="20" x2="12" y2="4"/>
-          <line x1="6" y1="20" x2="6" y2="14"/>
-        </svg>
-      </div>
-      <div class="card-title">Avaliação de Desempenho</div>
-      <div class="card-desc">Monitoramento, medição, análise de indicadores, auditoria interna e melhoria contínua com análise crítica pela Alta Direção.</div>
-      <div class="card-clauses">
-        <span class="clause c-both">ISO 14001</span>
-        <span class="clause c-both">ISO 45001</span>
-        <span class="clause c-sst">Cláusula 9</span>
-      </div>
-      <div class="card-cta disabled">
-        Indisponível no momento
-        <div class="cta-arrow-planned">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </div>
-      </div>
-    </a>
-
-  </div><!-- /grid -->
+    <!-- Formulário de campo -->
 
   <!-- Formulário de campo -->
   <div style="margin-top:12px">
@@ -787,6 +437,44 @@ window.toggleDarkMode = function() {
         </div>
       </div>
     </a>
+
+    <!-- GMUD -->
+    <a href="modulos/gmud.html" class="module-card ready" data-cat="env">
+      <span class="card-status-badge csb-ready">Disponível</span>
+      <div class="card-icon" style="background:#FAFAF8">
+        <svg fill="none" stroke-width="1.8" viewBox="0 0 24 24" style="stroke:#A67C14">
+          <polyline points="17 1 21 5 17 9"/>
+          <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+          <polyline points="7 23 3 19 7 15"/>
+          <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+        </svg>
+      </div>
+      <div class="card-title">GMUD — Gestão de Mudanças</div>
+      <div class="card-desc">Gestão estruturada de mudanças com triagem de impactos, plano de ação automático, aprovações e relatório de evidência para auditoria.</div>
+      <div class="card-clauses">
+        <span class="clause c-both">ISO 14001</span>
+        <span class="clause c-both">ISO 45001</span>
+        <span class="clause c-both">8.1.3 GMUD</span>
+      </div>
+      <div class="card-cta">
+        Acessar Módulo
+        <div class="cta-arrow">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </div>
+      </div>
+    </a>
+
+  </div><!-- /grid -->
+
+  <div style="margin-top:20px;padding:14px 18px;background:var(--bg-soft);border-radius:10px;border:1px solid var(--border);display:flex;align-items:center;gap:12px">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+    <div style="font-size:12.5px;color:var(--text-muted)">
+      <strong style="color:var(--gray-700)">Mais módulos em desenvolvimento:</strong>
+      Liderança e Participação (5), Apoio e Recursos (7), Avaliação de Desempenho (9) e ISO 9001.
+    </div>
+  </div>
   </div>
 
 </section>

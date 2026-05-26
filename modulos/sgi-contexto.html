@@ -1,228 +1,59 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hub Hub SGI — Sistema de Gestão</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hub SGI Lite — Contexto da Organização</title>
 <link rel="stylesheet" href="../css/hub.css">
-
-<style>
-/* SGI-Contexto — Premium overrides */
-body { font-family: 'Inter', -apple-system, sans-serif; }
-
-/* Layout — scroll no body, não no main */
-.layout { min-height: calc(100vh - 52px); }
-main { overflow: visible; }
-
-/* Seção de normas no canto superior direito da página (como no Manus) */
-.sec-norm-refs {
-  position: absolute;
-  top: 0; right: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 3px;
-  font-size: 10px;
-  color: var(--gray-400, #9CA3AF);
-  font-family: 'JetBrains Mono', monospace;
-}
-
-/* Cards internos mais refinados */
-.card {
-  box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 2px 8px rgba(0,0,0,.04);
-  border-color: #E5E7EB;
-}
-
-/* Botão de configuração no canto do card */
-.card-settings-btn {
-  width: 26px; height: 26px;
-  border-radius: 6px;
-  border: 1px solid #E5E7EB;
-  background: #F9FAFB;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  transition: all 140ms;
-  color: #9CA3AF;
-}
-.card-settings-btn:hover { background: #F3F4F6; color: #6B7280; }
-
-/* Foco nos inputs */
-input:focus, textarea:focus, select:focus {
-  border-color: #0F766E !important;
-  box-shadow: 0 0 0 3px rgba(15,118,110,.10) !important;
-}
-
-/* Análise Crítica IA — estilo especial */
-.nav-item[onclick*="s6"] {
-  background: linear-gradient(135deg, rgba(124,58,237,.05), rgba(13,148,136,.05));
-  border-left: 2px solid #7C3AED !important;
-  color: #5B21B6 !important;
-  font-weight: 600 !important;
-}
-.nav-item[onclick*="s6"]:hover {
-  background: linear-gradient(135deg, rgba(124,58,237,.10), rgba(13,148,136,.10));
-}
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
-
-/* Botões de sugestão chip */
-.btn.btn-sm {
-  border-radius: 5px;
-  font-size: 11.5px;
-}
-
-/* Info boxes */
-.info { border-radius: 0 6px 6px 0; }
-
-/* Modais */
-.mod-bg { backdrop-filter: blur(3px); background: rgba(17,24,39,.4); }
-.mod-box {
-  border-radius: 12px;
-  border: 1px solid #E5E7EB;
-  box-shadow: 0 8px 40px rgba(0,0,0,.12);
-}
-
-/* Página title area refinada */
-.ph { 
-  padding-bottom: 16px;
-  border-bottom: 1px solid #F3F4F6;
-  margin-bottom: 20px;
-  position: relative;
-}
-
-/* Referências ISO no canto */
-.iso-ref-tag {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: #9CA3AF;
-  background: #F9FAFB;
-  border: 1px solid #E5E7EB;
-  padding: 2px 7px;
-  border-radius: 4px;
-  margin-left: 6px;
-}
-</style>
-
 <script>
-// ── Dark Mode — inicializa ANTES do render para evitar flash ──
-(function() {
-  try {
-    var saved = localStorage.getItem('sgi-theme');
-    var sys   = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.setAttribute('data-theme', saved || (sys ? 'dark' : 'light'));
-  } catch(e) {}
-})();
+(function(){try{var s=localStorage.getItem('sgi-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(d?'dark':'light'));}catch(e){}})();
 </script>
 </head>
 <body>
 <header>
   <div class="hdr">
-    <!-- Botão voltar -->
-    <a href="../index.html" class="hdr-back" title="Voltar ao Hub" onclick="window.location.href='../index.html';return false;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-        <path d="M19 12H5M12 19l-7-7 7-7"/>
-      </svg>
-    </a>
-    <!-- Breadcrumb -->
-    <div class="hdr-breadcrumb">
-      <span>HUB-SGI</span>
-      <span class="hdr-breadcrumb-sep">/</span>
-      <span class="hdr-breadcrumb-current">Contexto da Organização</span>
-      <span class="hdr-clause" style="margin-left:6px">Cláusula 4 · <span id="header-normas-sub">ISO 14001 &amp; 45001</span></span>
-    </div>
-    <!-- Normas + Salvar -->
-    <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
-      <div class="norms">
-        <span class="nb nb-env" id="header-badge-14001">ISO 14001</span>
-        <span class="nb nb-sst" id="header-badge-45001">ISO 45001</span>
-        <span class="nb nb-9001" id="header-badge-9001" style="display:none">ISO 9001</span>
+    <div class="logo">
+      <div class="logo-ico">S</div>
+      <div>
+        <div class="logo-t">Hub SGI — Sistema de Gestão</div>
+        <div class="logo-s"><span id="header-normas-sub">ISO 14001 + ISO 45001 · Cláusulas 4.1 · 4.2 · 6.1</span></div>
       </div>
-      <!-- Dark mode toggle -->
-      <button class="dark-toggle" onclick="toggleDarkMode()" title="Alternar modo claro/escuro">
-        <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-        <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="5"/>
-          <line x1="12" y1="1" x2="12" y2="3"/>
-          <line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/>
-          <line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </svg>
-      </button>
-      <button class="btn-save" onclick="alert('Dados salvos automaticamente no navegador (localStorage).')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-          <polyline points="17 21 17 13 7 13 7 21"/>
-          <polyline points="7 3 7 8 15 8"/>
-        </svg>
-        Salvar SGI
-      </button>
+    </div>
+    <div class="norms">
+      <span class="nb nb-env" id="header-badge-14001">🌿 ISO 14001</span>
+      <span class="nb nb-sst" id="header-badge-45001">⛑️ ISO 45001</span>
     </div>
   </div>
 </header>
 <div class="layout">
 <aside>
-  <div class="nav-lbl">Estrutura Normativa SGI</div>
-  <div style="font-size:10px;color:var(--gray-400);padding:0 14px 10px;line-height:1.5">ISO 14001 &amp; ISO 45001</div>
-
-  <button class="nav-item on" onclick="goTo('s0')"><span class="nav-dot"></span>Contexto da Org.<span class="nav-cl">4.1</span></button>
-  <button class="nav-item" onclick="goTo('s_clima')" style="padding-left:26px">
-    <span class="nav-dot" style="background:var(--teal,#0D9488)"></span>
-    <span style="color:var(--teal-d,#0F766E)">Mudanças Climáticas</span>
-    <span class="nav-cl" style="background:#F0FDFA;color:#0F766E;border-color:#99F6E4">4.1</span>
-  </button>
+  <div class="nav-lbl">Cláusula 4.1</div>
+  <button class="nav-item on" onclick="goTo('s0')"><span class="nav-dot"></span>Sistema de Gestão<span class="nav-cl">4.1</span></button>
+  <div class="nav-lbl">Cláusula 4.2</div>
   <button class="nav-item" onclick="goTo('s1')"><span class="nav-dot"></span>Partes Interessadas<span class="nav-cl">4.2</span></button>
-
-  <div class="nav-lbl" style="margin-top:4px">5. Liderança e Part.</div>
-  <button class="nav-item" style="opacity:.45;cursor:not-allowed" disabled>
-    <span class="nav-dot"></span>Em breve
-    <span class="nav-cl">5</span>
-  </button>
-
-  <div class="nav-lbl" style="margin-top:4px">6. Planejamento</div>
+  <div class="nav-lbl">Cláusula 6.1</div>
   <button class="nav-item" onclick="goTo('s2')"><span class="nav-dot"></span>Aspectos & Perigos<span class="nav-cl">6.1.2</span></button>
   <button class="nav-item" onclick="goTo('s3')"><span class="nav-dot"></span>Riscos & Oport.<span class="nav-cl">6.1.1</span></button>
-  <button class="nav-item" onclick="goTo('s7')"><span class="nav-dot"></span>Objetivos & Metas<span class="nav-cl" id="obj-nav-badge">6.2</span></button>
-
-  <div class="nav-lbl" style="margin-top:4px">7. Apoio e Recursos</div>
+  <div class="nav-lbl">Cláusula 6.2</div>
+  <button class="nav-item" onclick="goTo('s7')"><span class="nav-dot"></span>Objetivos & Metas<span class="nav-cl" id="obj-nav-badge">0</span></button>
+  <div class="nav-lbl">Cláusula 7</div>
   <button class="nav-item" onclick="goTo('s8')"><span class="nav-dot"></span>Apoio<span class="nav-cl">7</span></button>
-
-  <div class="nav-lbl" style="margin-top:4px">8. Operação e MOC</div>
-  <button class="nav-item" style="opacity:.45;cursor:not-allowed" disabled>
-    <span class="nav-dot"></span>Em breve
-    <span class="nav-cl">8</span>
-  </button>
-
-  <div class="nav-lbl" style="margin-top:4px">9. Avaliação</div>
+  <div class="nav-lbl">Cláusula 9</div>
   <button class="nav-item" onclick="goTo('s9')"><span class="nav-dot"></span>Indicadores KPI<span class="nav-cl" id="kpi-nav-badge">9.1</span></button>
-  <button class="nav-item" onclick="goTo('s5')"><span class="nav-dot"></span>Gestão de Ações<span class="nav-cl" id="action-nav-badge">0</span></button>
+  <div class="nav-lbl">Consolidação</div>
+  <button class="nav-item" onclick="goTo('s5')"><span class="nav-dot"></span>Gestão de Ações<span class="nav-cl" id="action-nav-badge" style="background:#ffe4e4;color:var(--red)">0</span></button>
+  <button class="nav-item" onclick="goTo('s6')" style="border-left:3px solid var(--purple)!important"><span class="nav-dot" style="background:var(--purple)"></span><span style="color:var(--purple);font-weight:600">Análise Crítica IA</span><span class="nav-cl" style="background:var(--purple-l);color:var(--purple)">9.3</span></button>
   <button class="nav-item" onclick="goTo('s4')"><span class="nav-dot"></span>Resumo & Exportar<span class="nav-cl">SGI</span></button>
-
-  <!-- Análise Assistida por IA -->
-  <div class="nav-ai-section" style="margin-top:12px">
-    <div class="nav-ai-title">Análise Assistida</div>
-    <div class="nav-ai-desc">Análise crítica baseada nos dados preenchidos no SGI.</div>
-    <button class="nav-ai-btn" onclick="goTo('s6')">Análise de Conformidade</button>
-  </div>
-
 </aside>
 <main>
 
 <!-- ===== S0: CONTEXTO 4.1 ===== -->
 <div class="sec on" id="s0">
   <div class="ph">
-    <div class="pt">Contexto da Organização <span class="ct">4.1 — ISO 14001 + 45001</span><button class="help-btn" onclick="openHelp('s0')" title="Orientações">?</button></div>
+    <div class="pt">Sistema de Gestão <span class="ct">4.1 — ISO 14001 + 45001</span><button class="help-btn" onclick="openHelp('s0')" title="Orientações">?</button></div>
     <p class="ps"><span id="ctx41-sub">Identifique o que está fora e dentro da organização que pode influenciar o SGI — fatores econômicos, regulatórios, tecnológicos, sociais, capacidades internas e condições ambientais.</span></p>
   </div>
 
@@ -388,7 +219,17 @@ input:focus, textarea:focus, select:focus {
       <div class="sq so"><div class="sq-t">🎯 Oportunidades — Fatores externos a aproveitar</div><div class="sq-i" id="sw-o">—</div></div>
       <div class="sq st"><div class="sq-t">🔴 Ameaças — Fatores externos que podem prejudicar o SGI</div><div class="sq-i" id="sw-t">—</div></div>
     </div>
-    <div id="swot-suggest-btn" style="display:none;margin-top:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;font-size:11px">
+    <div style="background:var(--green-xl);border:1px solid #E5E0D8;border-radius:6px;padding:8px 10px;color:var(--green-txt)">
+      <strong>💪 Força / 🌱 Oportunidade</strong><br>
+      Fator favorável → gera <strong>Oportunidade</strong> no 6.1.1
+    </div>
+    <div style="background:var(--red-l);border:1px solid #FCA5A5;border-radius:6px;padding:8px 10px;color:var(--red-d,#991B1B)">
+      <strong>⚠️ Fraqueza / 🔴 Ameaça</strong><br>
+      Fator desfavorável → gera <strong>Risco</strong> no 6.1.1
+    </div>
+  </div>
+  <div id="swot-suggest-btn"  style="display:none;margin-top:12px">
       <button class="btn btn-sm" style="background:var(--blue);color:#fff;border-color:var(--blue);font-weight:500" onclick="goTo('s3');generateROFromSWOT()">
         ⚡ Gerar Riscos & Oportunidades a partir desta SWOT →
       </button>
@@ -396,21 +237,8 @@ input:focus, textarea:focus, select:focus {
   </div>
 </div>
 
-
-
-<!-- ===== S_CLIMA: MUDANÇAS CLIMÁTICAS 4.1 ===== -->
-<div class="sec" id="s_clima">
-  <div class="ph">
-    <div class="pt">
-      Mudanças Climáticas
-      <span class="ct">4.1 — Contexto</span>
-      <button class="help-btn" onclick="openClimaHelp()" title="Como analisar">?</button>
-    </div>
-    <p class="ps">Analise como o clima afeta a organização e como a organização contribui para as mudanças climáticas. Evidência obrigatória para auditoria (Anexo SL §4.1).</p>
-  </div>
-
 <!-- ===== MUDANÇAS CLIMÁTICAS — 4.1 ISO 14001 + 45001 (Anexo SL) ===== -->
-<div style="background:var(--white);border-radius:var(--r);padding:18px 20px;border:1px solid var(--gray-b);box-shadow:var(--shadow)">
+<div style="background:var(--white);border-radius:var(--r);padding:18px 20px;margin-top:16px;border:2px solid #1a6b9e;box-shadow:var(--shadow)">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:8px">
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:22px">🌡️</span>
@@ -600,7 +428,7 @@ input:focus, textarea:focus, select:focus {
 
     <!-- Conclusão separada por norma -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-      <div id="clima-bloco-14001" style="background:var(--green-l);border:1px solid #a8dfc8;border-radius:8px;padding:12px">
+      <div id="clima-bloco-14001" style="background:var(--green-l);border:1px solid #99F6E4;border-radius:8px;padding:12px">
         <div style="font-size:11px;font-weight:700;color:var(--green-d);margin-bottom:8px">🌿 ISO 14001 — Impacto ambiental</div>
         <label style="font-size:11px">As mudanças climáticas afetam os objetivos do SGA?</label>
         <select id="clima-afeta-14001" onchange="updateClimaStatus()" style="margin-bottom:8px">
@@ -614,7 +442,7 @@ input:focus, textarea:focus, select:focus {
           placeholder="Ex.: Risco de estiagem afeta disponibilidade hídrica para o processo. Oportunidade de eficiência energética incorporada como objetivo ambiental. Emissões de GEE predominantemente de Escopo 2."
           style="font-size:11px"></textarea>
       </div>
-      <div id="clima-bloco-45001" style="background:var(--blue-l);border:1px solid #a8cef0;border-radius:8px;padding:12px">
+      <div id="clima-bloco-45001" style="background:var(--blue-l);border:1px solid #E5E0D8;border-radius:8px;padding:12px">
         <div style="font-size:11px;font-weight:700;color:var(--blue-d);margin-bottom:8px">⛑️ ISO 45001 — Saúde e segurança</div>
         <label style="font-size:11px">As mudanças climáticas afetam os objetivos do SGSST?</label>
         <select id="clima-afeta-45001" onchange="updateClimaStatus()" style="margin-bottom:8px">
@@ -676,9 +504,6 @@ input:focus, textarea:focus, select:focus {
 
 
 
-
-</div>
-
 <!-- ===== S1: PARTES INTERESSADAS 4.2 ===== -->
 <div class="sec" id="s1">
   <div class="ph">
@@ -737,23 +562,24 @@ input:focus, textarea:focus, select:focus {
   </div>
 
   <!-- FLUXO DE CAMPO -->
-  <div id="ap-bloco-45001" data-norma="sst" style="background:var(--blue-l);border:1px solid #a8cef0;border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:12px;color:var(--blue-d);line-height:1.7">
+  <div id="ap-bloco-45001" data-norma="sst" style="background:var(--blue-l);border:1px solid #E5E0D8;border-radius:var(--r);padding:12px 16px;margin-bottom:14px;font-size:12px;color:var(--blue-d);line-height:1.7">
     💡 <strong>ISO 14001 e ISO 45001</strong> exigem identificação por <strong>Atividade, Produto e Serviço</strong>. A 14001 inclui também a <strong>perspectiva de ciclo de vida</strong> e avaliação de <strong>significância</strong>. A 45001 requer avaliação do <strong>grau do risco</strong> e aplicação da <strong>hierarquia de controles</strong>. Por isso, os levantamentos são exportados em planilhas <strong>separadas por norma</strong>.
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
 
     <!-- 14001 -->
-    <div id="ap-bloco-14001" data-norma="env" style="background:var(--green-l);border:1px solid #a8dfc8;border-radius:var(--r);padding:14px 16px">
+    <div id="ap-bloco-14001" data-norma="env" style="background:var(--green-l);border:1px solid #99F6E4;border-radius:var(--r);padding:14px 16px">
       <div style="font-size:12px;font-weight:700;color:var(--green-d);margin-bottom:6px">🌿 ISO 14001 — Aspectos &amp; Impactos Ambientais</div>
       <p style="font-size:12px;color:var(--green-d);margin-bottom:10px;line-height:1.6">
         Inclui: <strong>Atividade/Produto/Serviço · Ciclo de vida · Aspecto · Impacto · P × S · Significância</strong>
       </p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
         <button class="btn btn-sm" style="background:var(--green);color:#fff;border-color:var(--green);font-weight:500" onclick="exportCSV14001()">⬇️ Baixar planilha 14001 (.xlsx)</button>
+        <button class="btn btn-sm" style="border-color:var(--teal);color:var(--teal);font-weight:500" onclick="exportHTMLAP()">🌐 Gerar HTML para auditoria</button>
         <button class="btn btn-sm" style="background:var(--green-d);color:#fff;border-color:var(--green-d);font-weight:500" onclick="openCampo14001()">📋 Formulário de campo — 14001</button>
       </div>
-      <div style="border-top:1px dashed #a8dfc8;padding-top:8px;margin-top:4px">
+      <div style="border-top:1px dashed #99F6E4;padding-top:8px;margin-top:4px">
         <div style="font-size:11px;font-weight:600;color:var(--green-d);margin-bottom:4px">📥 Importar após preenchimento:</div>
         <label class="btn btn-sm" style="background:var(--purple);color:#fff;border-color:var(--purple);font-weight:500;cursor:pointer;display:inline-flex">
           📱 Importar do formulário de campo (.json)
@@ -768,7 +594,7 @@ input:focus, textarea:focus, select:focus {
     </div>
 
     <!-- 45001 -->
-    <div style="background:var(--blue-l);border:1px solid #a8cef0;border-radius:var(--r);padding:14px 16px">
+    <div style="background:var(--blue-l);border:1px solid #E5E0D8;border-radius:var(--r);padding:14px 16px">
       <div style="font-size:12px;font-weight:700;color:var(--blue-d);margin-bottom:6px">⛑️ ISO 45001 — Perigos &amp; Riscos de SST</div>
       <p style="font-size:12px;color:var(--blue-d);margin-bottom:10px;line-height:1.6">
         Inclui: <strong>Atividade/Produto/Serviço · Perigo · Risco · P × S · Grau · Hierarquia de controles</strong>
@@ -777,7 +603,7 @@ input:focus, textarea:focus, select:focus {
         <button class="btn btn-sm" style="background:var(--blue);color:#fff;border-color:var(--blue);font-weight:500" onclick="exportCSV45001()">⬇️ Baixar planilha 45001 (.xlsx)</button>
         <button class="btn btn-sm" style="background:var(--blue-d);color:#fff;border-color:var(--blue-d);font-weight:500" onclick="openCampo45001()">📋 Formulário de campo — 45001</button>
       </div>
-      <div style="border-top:1px dashed #a8cef0;padding-top:8px;margin-top:4px">
+      <div style="border-top:1px dashed #E5E0D8;padding-top:8px;margin-top:4px">
         <div style="font-size:11px;font-weight:600;color:var(--blue-d);margin-bottom:4px">📥 Importar após preenchimento:</div>
         <label class="btn btn-sm" style="background:var(--blue-d);color:#fff;border-color:var(--blue-d);font-weight:500;cursor:pointer;display:inline-flex">
           📂 Importar 45001 .xlsx/.csv
@@ -831,7 +657,7 @@ input:focus, textarea:focus, select:focus {
   </div>
 
   <!-- GERAÇÃO AUTOMÁTICA -->
-  <div style="background:var(--green-l);border:1px solid #a8dfc8;border-radius:var(--r);padding:14px 16px;margin-bottom:16px">
+  <div style="background:var(--green-l);border:1px solid #99F6E4;border-radius:var(--r);padding:14px 16px;margin-bottom:16px">
     <div style="font-size:13px;font-weight:600;color:var(--green-d);margin-bottom:8px">⚡ Geração automática de Riscos & Oportunidades</div>
     <p style="font-size:12px;color:var(--green-d);margin-bottom:12px;line-height:1.7">
       Analisa automaticamente a SWOT (4.1), as Partes Interessadas selecionadas (4.2) e os Aspectos/Perigos classificados como críticos ou altos (6.1.2) e sugere riscos e oportunidades com rastreabilidade da origem normativa.
@@ -849,8 +675,8 @@ input:focus, textarea:focus, select:focus {
       <div class="ct2">📊 Matriz P × S</div>
       <div class="matrix-wrap"><table class="matrix" id="risk-matrix"></table></div>
       <div class="flex" style="gap:12px;flex-wrap:wrap;font-size:11px;margin-top:6px">
-        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e8f5ef;margin-right:3px"></span>Baixo</span>
-        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#fef9e7;margin-right:3px"></span>Médio</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#FAFAF8;margin-right:3px"></span>Baixo</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#FAFAF8;margin-right:3px"></span>Médio</span>
         <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#fde8d8;margin-right:3px"></span>Alto</span>
         <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#ffe4e4;margin-right:3px"></span>Crítico</span>
       </div>
@@ -1091,7 +917,7 @@ input:focus, textarea:focus, select:focus {
   </div>
 
   <!-- Importar sugestões dos R&O -->
-  <div id="obj-ro-suggest" style="display:none;background:var(--blue-l);border:1px solid #a8cef0;border-radius:var(--r);padding:12px 16px;margin-bottom:14px">
+  <div id="obj-ro-suggest" style="display:none;background:var(--blue-l);border:1px solid #E5E0D8;border-radius:var(--r);padding:12px 16px;margin-bottom:14px">
     <div style="font-size:12px;font-weight:700;color:var(--blue-d);margin-bottom:6px">⚡ Sugestão automática baseada nos Riscos & Oportunidades</div>
     <p style="font-size:12px;color:var(--blue-d);margin-bottom:10px">Os itens abaixo foram identificados na cláusula 6.1.1 como altos ou críticos e ainda não possuem objetivo associado. Deseja criar objetivos a partir deles?</p>
     <div id="obj-ro-list" style="margin-bottom:10px"></div>
@@ -1264,23 +1090,8 @@ input:focus, textarea:focus, select:focus {
 
 <script src="../js/hub-lite-all.js"></script>
 <script>
-(function waitRender(){
-  if(typeof renderClimaSugestoes==='function' && typeof applyNormasConfig==='function'){
-    var el=document.getElementById('clima-sugest-cards');
-    if(el){renderClimaSugestoes();return;}
-  }
-  setTimeout(waitRender,200);
-})();
-</script>
-
-<script>
-// Dark mode toggle global
-window.toggleDarkMode = function() {
-  var root  = document.documentElement;
-  var theme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  root.setAttribute('data-theme', theme);
-  try { localStorage.setItem('sgi-theme', theme); } catch(e) {}
-};
+window.toggleDarkMode=function(){var r=document.documentElement;var t=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',t);try{localStorage.setItem('sgi-theme',t);}catch(e){}};
+(function waitRender(){if(typeof renderClimaSugestoes==='function'){var el=document.getElementById('clima-sugest-cards');if(el){renderClimaSugestoes();return;}}setTimeout(waitRender,200);})();
 </script>
 </body>
 </html>
