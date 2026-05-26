@@ -1,7 +1,6 @@
 // Hub SGI Lite — Versão sem API
-// Toda a lógica roda localmente no navegador
 
-// Hub SGI — Módulo completo SGI
+// Hub SGI
 
 
 var S = {
@@ -52,9 +51,14 @@ var S = {
 
 // NAV
 function goTo(id) {
-  ['s0','s1','s2','s3','s7','s8','s9','s5','s6','s4'].forEach(function(s,i){
-    document.getElementById(s).classList.toggle('on',s===id);
-    document.querySelectorAll('.nav-item')[i].classList.toggle('on',s===id);
+  var allSecs=['s0','s_clima','s1','s2','s3','s7','s8','s9','s5','s6','s4'];
+  allSecs.forEach(function(s){
+    var el=document.getElementById(s);
+    if(el) el.classList.toggle('on',s===id);
+  });
+  document.querySelectorAll('.nav-item').forEach(function(btn){
+    var match=(btn.getAttribute('onclick')||'').indexOf("goTo('"+id+"')")!==-1;
+    btn.classList.toggle('on',match);
   });
   if(id==='s4') buildSumm();
   if(id==='s5') renderActionMgr();
@@ -62,6 +66,12 @@ function goTo(id) {
   if(id==='s8') initApoio();
   if(id==='s9') initKPI();
   if(id==='s7') renderObj();
+  if(id==='s_clima'){
+    setTimeout(function(){
+      if(typeof renderClimaSugestoes==='function') renderClimaSugestoes();
+      if(typeof updateClimaStatus==='function') updateClimaStatus();
+    },100);
+  }
 }
 
 // FACTORS
@@ -2282,46 +2292,94 @@ function finalizeSWOT() {
 // GERAÇÃO AUTOMÁTICA DE RISCOS & OPORTUNIDADES
 // ═══════════════════════════════════════════════════════════
 function generateROFromSWOT() {
+  // ═══════════════════════════════════════════════════════════════
+  // SWOT → R&O (ISO 14001/45001 §6.1.1)
+  //
+  // Lógica normativa:
+  //   Força     (interno favorável)  → Oportunidade para o SGI
+  //   Fraqueza  (interno desfavorável) → Risco para o SGI
+  //   Oportunidade (externo favorável) → Oportunidade para o SGI
+  //   Ameaça    (externo desfavorável) → Risco para o SGI
+  //
+  // Rastreabilidade: origin='4.1-swot' + src com descrição da fonte
+  // ═══════════════════════════════════════════════════════════════
+
   var added = 0;
   var existing = S.roItems.map(function(r){ return r.desc.toLowerCase(); });
 
   function push(type, norm, desc, src, prob, sev, origin) {
-    if (existing.indexOf(desc.toLowerCase()) !== -1) return; // evita duplicata
+    if (existing.indexOf(desc.toLowerCase()) !== -1) return;
     var score = prob * sev;
     S.roItems.push({
-      type:type, norm:norm, desc:desc, src:src, prob:prob, sev:sev, score:score,
-      cls: score<=4?'low':score<=9?'med':score<=16?'high':'crit',
-      action:'', origin:origin, autoGen:true
+      type:    type,
+      norm:    norm,
+      desc:    desc,
+      src:     src,
+      prob:    prob,
+      sev:     sev,
+      score:   score,
+      cls:     score<=4?'low':score<=9?'med':score<=16?'high':'crit',
+      action:  '',
+      origin:  origin,
+      autoGen: true
     });
     existing.push(desc.toLowerCase());
     added++;
   }
 
-  // Ameaças → Riscos
-  S.factors.ext.filter(function(f){ return f.type==='des' && f.rel==='sim'; }).forEach(function(f) {
-    push('risk', f.norm==='env'?'env':f.norm==='sst'?'sst':'both',
-      'Risco decorrente de ameaça: ' + f.desc,
-      '4.1 — Contexto externo (Ameaça SWOT)', 3, 3, '4.1-swot');
-  });
+  function getNorm(f) {
+    return f.norm==='env'?'env': f.norm==='sst'?'sst':'both';
+  }
 
-  // Oportunidades externas → Oportunidades
-  S.factors.ext.filter(function(f){ return f.type==='fav' && f.rel==='sim'; }).forEach(function(f) {
-    push('opp', f.norm==='env'?'env':f.norm==='sst'?'sst':'both',
-      'Oportunidade: ' + f.desc,
-      '4.1 — Contexto externo (Oportunidade SWOT)', 3, 2, '4.1-swot');
-  });
+  // ── FATORES INTERNOS ──────────────────────────────────────────
+  // Força → Oportunidade
+  S.factors.int.filter(function(f){ return f.type==='fav' && f.rel==='sim'; })
+    .forEach(function(f) {
+      push('opp', getNorm(f),
+        f.desc,
+        '4.1 — Fator interno favorável (Força) → Oportunidade para o SGI',
+        2, 2, '4.1-swot');
+    });
 
-  // Fraquezas → Riscos internos
-  S.factors.int.filter(function(f){ return f.type==='des' && f.rel==='sim'; }).forEach(function(f) {
-    push('risk', f.norm==='env'?'env':f.norm==='sst'?'sst':'both',
-      'Risco interno decorrente de fraqueza: ' + f.desc,
-      '4.1 — Contexto interno (Fraqueza SWOT)', 2, 3, '4.1-swot');
-  });
+  // Fraqueza → Risco
+  S.factors.int.filter(function(f){ return f.type==='des' && f.rel==='sim'; })
+    .forEach(function(f) {
+      push('risk', getNorm(f),
+        f.desc,
+        '4.1 — Fator interno desfavorável (Fraqueza) → Risco para o SGI',
+        2, 3, '4.1-swot');
+    });
 
-  renderRO(); buildMatrix();
-  alert(added > 0
-    ? added + ' item(s) gerado(s) a partir da SWOT. Revise probabilidade, severidade e ação planejada.'
-    : 'Nenhum item novo gerado. Verifique se há fatores marcados como relevantes na aba 4.1.');
+  // ── FATORES EXTERNOS ──────────────────────────────────────────
+  // Oportunidade externa → Oportunidade
+  S.factors.ext.filter(function(f){ return f.type==='fav' && f.rel==='sim'; })
+    .forEach(function(f) {
+      push('opp', getNorm(f),
+        f.desc,
+        '4.1 — Fator externo favorável (Oportunidade) → Oportunidade para o SGI',
+        3, 2, '4.1-swot');
+    });
+
+  // Ameaça → Risco
+  S.factors.ext.filter(function(f){ return f.type==='des' && f.rel==='sim'; })
+    .forEach(function(f) {
+      push('risk', getNorm(f),
+        f.desc,
+        '4.1 — Fator externo desfavorável (Ameaça) → Risco para o SGI',
+        3, 3, '4.1-swot');
+    });
+
+  renderRO();
+  if (typeof buildMatrix === 'function') buildMatrix();
+
+  if (added > 0) {
+    alert('✅ ' + added + ' item(s) gerado(s) no 6.1.1 a partir da SWOT:\n\n'
+      + '• Forças e Oportunidades → Oportunidades para o SGI\n'
+      + '• Fraquezas e Ameaças → Riscos para o SGI\n\n'
+      + 'Acesse a cláusula 6.1.1 para revisar probabilidade, severidade e ação planejada.');
+  } else {
+    alert('Nenhum item novo gerado.\nVerifique se há fatores marcados como relevantes para o SGI na aba 4.1.');
+  }
 }
 
 function generateROFromPI() {
@@ -2452,253 +2510,6 @@ function initACSummary() {
 }
 
 // ── Monta o prompt completo para o agente ───────────────────────
-
-// ═══════════════════════════════════════════════════════════════════
-// ANÁLISE CRÍTICA LOCAL — SEM API
-// Gera um relatório estruturado baseado nos dados preenchidos no SGI
-// ═══════════════════════════════════════════════════════════════════
-
-function buildLocalSummary() {
-  var org    = document.getElementById('org-name')   ? document.getElementById('org-name').value   : '';
-  var sector = document.getElementById('org-sector') ? document.getElementById('org-sector').value : '';
-  var scope  = document.getElementById('org-scope')  ? document.getElementById('org-scope').value  : '';
-
-  // Coleta dados de todos os módulos
-  var intFav = (S.factors && S.factors.int || []).filter(function(f){return f.type==='fav'&&f.rel==='sim';});
-  var intDes = (S.factors && S.factors.int || []).filter(function(f){return f.type==='des'&&f.rel==='sim';});
-  var extFav = (S.factors && S.factors.ext || []).filter(function(f){return f.type==='fav'&&f.rel==='sim';});
-  var extDes = (S.factors && S.factors.ext || []).filter(function(f){return f.type==='des'&&f.rel==='sim';});
-
-  var piSel = (S.pi || []).filter(function(p){return p.sel;});
-  var piObrig = piSel.filter(function(p){return p.obrig==='sim';});
-
-  var apSig = (S.apItems || []).filter(function(a){return a.sig==='S';});
-  var apTotal = (S.apItems || []).length;
-
-  var roRisk = (S.ros || []).filter(function(r){return r.type==='risk';});
-  var roOpp  = (S.ros || []).filter(function(r){return r.type==='opp';});
-  var roAlta = (S.ros || []).filter(function(r){return r.priority==='high';});
-
-  var objTotal = (S.objetivos || []).length;
-  var objConc  = (S.objetivos || []).filter(function(o){return o.status==='concluido';}).length;
-
-  var acoesPend = (S.acoes || []).filter(function(a){return a.status!=='concluido';}).length;
-
-  // Analisa completude por seção
-  var completude = {
-    contexto:  (intFav.length + intDes.length + extFav.length + extDes.length) > 0,
-    pi:        piSel.length > 0,
-    aspectos:  apTotal > 0,
-    ros:       (roRisk.length + roOpp.length) > 0,
-    objetivos: objTotal > 0,
-    clima:     S.clima && S.clima.analisado,
-  };
-
-  return {
-    org, sector, scope,
-    intFav, intDes, extFav, extDes,
-    piSel, piObrig,
-    apSig, apTotal,
-    roRisk, roOpp, roAlta,
-    objTotal, objConc,
-    acoesPend,
-    completude,
-  };
-}
-
-function runAIAnalysis() {
-  initACSummary();
-  var org = document.getElementById('org-name') ? document.getElementById('org-name').value : '';
-  if (!org) {
-    alert('Informe o nome da organização na aba 4.1 antes de iniciar a análise.');
-    return;
-  }
-
-  var wrap  = document.getElementById('ac-briefing-wrap');
-  var body  = document.getElementById('ac-briefing-body');
-  var stat  = document.getElementById('ac-briefing-status');
-  var delib = document.getElementById('ac-delib-card');
-
-  if (wrap)  wrap.style.display = 'block';
-  if (stat)  { stat.textContent = '⚡ Gerando análise...'; stat.style.background = 'var(--amber-l)'; stat.style.color = 'var(--amber-d)'; }
-  if (delib) delib.style.display = 'none';
-
-  AC.timestamp = new Date().toLocaleString('pt-BR');
-  var ts = document.getElementById('ac-briefing-timestamp');
-  if (ts) ts.textContent = 'Análise gerada em ' + AC.timestamp;
-
-  // Gera análise local com base nos dados
-  var d = buildLocalSummary();
-  var html = renderLocalAnalysis(d);
-
-  setTimeout(function() {
-    if (body) body.innerHTML = html;
-    if (stat) { stat.textContent = '✅ Análise concluída'; stat.style.background = 'var(--green-l)'; stat.style.color = 'var(--green-txt, var(--green-d))'; }
-
-    // Gera pontos de deliberação automaticamente
-    var pontos = buildDeliberationPoints(d);
-    if (delib && pontos.length > 0) {
-      delib.style.display = 'block';
-      var deliberEl = document.getElementById('ac-delib-list');
-      if (deliberEl) {
-        deliberEl.innerHTML = pontos.map(function(p, i) {
-          return '<div style="padding:12px 14px;border-radius:8px;border:1px solid var(--gray-b);background:var(--white);margin-bottom:8px">'
-            + '<div style="font-size:11px;font-weight:700;color:' + (p.type==='risk' ? 'var(--red)' : p.type==='opp' ? 'var(--green)' : 'var(--amber)') + ';margin-bottom:4px">'
-            + (p.type==='risk' ? '⚠️ PONTO DE ATENÇÃO' : p.type==='opp' ? '✅ PONTO POSITIVO' : '📋 RECOMENDAÇÃO')
-            + '</div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">' + p.titulo + '</div>'
-            + '<div style="font-size:12px;color:var(--text2)">' + p.desc + '</div>'
-            + '</div>';
-        }).join('');
-      }
-    }
-  }, 800);
-}
-
-function renderLocalAnalysis(d) {
-  var normas = [];
-  if (S.normas && S.normas.iso14001) normas.push('ISO 14001');
-  if (S.normas && S.normas.iso45001) normas.push('ISO 45001');
-  if (!normas.length) normas = ['ISO 14001', 'ISO 45001'];
-
-  var completude_pct = Math.round(
-    Object.values(d.completude).filter(Boolean).length /
-    Object.keys(d.completude).length * 100
-  );
-
-  var status_color = completude_pct >= 80 ? 'var(--green)' : completude_pct >= 50 ? 'var(--amber)' : 'var(--red)';
-
-  var html = '<div style="font-family:var(--font);font-size:13px;line-height:1.7">'
-
-    // Cabeçalho
-    + '<div style="background:var(--gray-l);border-radius:8px;padding:14px 16px;margin-bottom:16px">'
-    + '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">📋 Análise Crítica do SGI</div>'
-    + '<div style="font-size:12px;color:var(--text2)">' + d.org + (d.sector ? ' · ' + d.sector : '') + ' · ' + normas.join(' + ') + '</div>'
-    + '<div style="margin-top:10px;display:flex;align-items:center;gap:10px">'
-    + '<div style="font-size:11px;font-weight:600;color:var(--text2)">Completude do SGI:</div>'
-    + '<div style="flex:1;height:8px;background:var(--gray-b);border-radius:10px;overflow:hidden">'
-    + '<div style="height:100%;width:' + completude_pct + '%;background:' + status_color + ';border-radius:10px;transition:width .6s"></div></div>'
-    + '<div style="font-size:12px;font-weight:700;color:' + status_color + '">' + completude_pct + '%</div>'
-    + '</div></div>'
-
-    // 4.1 Contexto
-    + '<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:6px">'
-    + (d.completude.contexto ? '✅' : '⚠️') + ' 4.1 Contexto da Organização</div>'
-    + '<ul style="margin:0 0 0 16px;padding:0;font-size:12px;color:var(--text2)">'
-    + '<li>Forças identificadas: <strong>' + d.intFav.length + '</strong></li>'
-    + '<li>Fraquezas identificadas: <strong>' + d.intDes.length + '</strong></li>'
-    + '<li>Oportunidades externas: <strong>' + d.extFav.length + '</strong></li>'
-    + '<li>Ameaças externas: <strong>' + d.extDes.length + '</strong></li>'
-    + '<li>Análise climática: <strong>' + (d.completude.clima ? '✅ Registrada' : '⚠️ Pendente') + '</strong></li>'
-    + '</ul></div>'
-
-    // 4.2 Partes Interessadas
-    + '<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">'
-    + (d.completude.pi ? '✅' : '⚠️') + ' 4.2 Partes Interessadas</div>'
-    + '<ul style="margin:0 0 0 16px;padding:0;font-size:12px;color:var(--text2)">'
-    + '<li>PIs relevantes cadastradas: <strong>' + d.piSel.length + '</strong></li>'
-    + '<li>Com obrigação de conformidade: <strong>' + d.piObrig.length + '</strong></li>'
-    + '</ul></div>'
-
-    // 6.1 Aspectos/Perigos
-    + '<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">'
-    + (d.completude.aspectos ? '✅' : '⚠️') + ' 6.1.2 Aspectos & Perigos</div>'
-    + '<ul style="margin:0 0 0 16px;padding:0;font-size:12px;color:var(--text2)">'
-    + '<li>Total cadastrados: <strong>' + d.apTotal + '</strong></li>'
-    + '<li>Significativos: <strong style="color:var(--amber)">' + d.apSig.length + '</strong></li>'
-    + '</ul></div>'
-
-    // 6.1.1 R&O
-    + '<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">'
-    + (d.completude.ros ? '✅' : '⚠️') + ' 6.1.1 Riscos & Oportunidades</div>'
-    + '<ul style="margin:0 0 0 16px;padding:0;font-size:12px;color:var(--text2)">'
-    + '<li>Riscos identificados: <strong>' + d.roRisk.length + '</strong> (' + d.roAlta.length + ' de alta prioridade)</li>'
-    + '<li>Oportunidades: <strong>' + d.roOpp.length + '</strong></li>'
-    + '</ul></div>'
-
-    // 6.2 Objetivos
-    + '<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">'
-    + (d.completude.objetivos ? '✅' : '⚠️') + ' 6.2 Objetivos e Metas</div>'
-    + '<ul style="margin:0 0 0 16px;padding:0;font-size:12px;color:var(--text2)">'
-    + '<li>Objetivos estabelecidos: <strong>' + d.objTotal + '</strong></li>'
-    + '<li>Concluídos: <strong>' + d.objConc + '</strong></li>'
-    + '</ul></div>'
-
-    // Ações
-    + (d.acoesPend > 0
-      ? '<div style="background:var(--amber-l);border-left:3px solid var(--amber);border-radius:0 6px 6px 0;padding:10px 14px;font-size:12px;color:var(--amber-d);margin-bottom:14px">'
-        + '⚠️ Há <strong>' + d.acoesPend + ' ação(ões) pendente(s)</strong> que requerem atenção da Alta Direção.</div>'
-      : '')
-
-    + '</div>';
-
-  return html;
-}
-
-function buildDeliberationPoints(d) {
-  var pontos = [];
-
-  // Aspectos significativos sem controle
-  if (d.apSig.length > 0) {
-    pontos.push({
-      type: 'risk',
-      titulo: d.apSig.length + ' aspecto(s)/perigo(s) significativo(s) identificado(s)',
-      desc: 'Verificar se os controles operacionais estão adequados e se os objetivos cobrem os mais críticos.'
-    });
-  }
-
-  // R&O de alta prioridade
-  if (d.roAlta.length > 0) {
-    pontos.push({
-      type: 'risk',
-      titulo: d.roAlta.length + ' risco(s) de alta prioridade',
-      desc: 'Esses riscos devem ter planos de ação definidos e monitoramento periódico.'
-    });
-  }
-
-  // Oportunidades a explorar
-  if (d.roOpp.length > 0) {
-    pontos.push({
-      type: 'opp',
-      titulo: d.roOpp.length + ' oportunidade(s) identificada(s)',
-      desc: 'Avaliar quais oportunidades foram convertidas em objetivos e metas do SGI.'
-    });
-  }
-
-  // Clima não analisado
-  if (!d.completude.clima) {
-    pontos.push({
-      type: 'rec',
-      titulo: 'Análise de mudanças climáticas pendente',
-      desc: 'O Anexo SL exige evidência de análise climática no contexto. Completar o módulo de Mudanças Climáticas.'
-    });
-  }
-
-  // Ações em aberto
-  if (d.acoesPend > 0) {
-    pontos.push({
-      type: 'risk',
-      titulo: d.acoesPend + ' ação(ões) pendente(s) de revisão',
-      desc: 'A Alta Direção deve deliberar sobre prazo, responsável e adequação dos recursos.'
-    });
-  }
-
-  // SGI incompleto
-  var incompletas = Object.entries(d.completude).filter(function(e){return !e[1];});
-  if (incompletas.length > 0) {
-    pontos.push({
-      type: 'rec',
-      titulo: 'Seções do SGI com preenchimento pendente',
-      desc: 'As seguintes seções ainda precisam ser preenchidas: ' +
-        incompletas.map(function(e){
-          return {contexto:'4.1 Contexto',pi:'4.2 Partes Interessadas',
-                  aspectos:'6.1.2 Aspectos',ros:'6.1.1 R&O',
-                  objetivos:'6.2 Objetivos',clima:'4.1 Clima'}[e[0]] || e[0];
-        }).join(', ') + '.'
-    });
-  }
-
-  return pontos;
-}
 
 
 function rerunAnalysis() {
@@ -3830,6 +3641,70 @@ function restoreNormasConfig() {
 }
 
 
+
+// ═══════════════════════════════════════════════════════════════════
+// EXPORTAR HTML — ASPECTOS & PERIGOS
+// ═══════════════════════════════════════════════════════════════════
+function exportHTMLAP() {
+  var org = (document.getElementById('org-name')||{}).value || 'Organização';
+  var items = S.apItems || [];
+  if (!items.length) { alert('Nenhum aspecto/perigo cadastrado.'); return; }
+
+  var normas = [];
+  if (S.normas && S.normas.iso14001) normas.push('ISO 14001');
+  if (S.normas && S.normas.iso45001) normas.push('ISO 45001');
+  if (!normas.length) normas = ['ISO 14001','ISO 45001'];
+
+  var rows14 = items.filter(function(i){ return i.type==='env'; });
+  var rows45 = items.filter(function(i){ return i.type==='sst'; });
+
+  function buildTable(rows, tipo) {
+    if (!rows.length) return '<p style="color:#666;font-size:12px">Nenhum item cadastrado.</p>';
+    return '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px">'
+      + '<thead><tr style="background:'+(tipo==='env'?'#D1FAE5':'#CCFBF1')+'">'
+      + '<th style="padding:8px;border:1px solid #ccc;text-align:left">Processo</th>'
+      + '<th style="padding:8px;border:1px solid #ccc;text-align:left">'+(tipo==='env'?'Aspecto Ambiental':'Perigo SST')+'</th>'
+      + '<th style="padding:8px;border:1px solid #ccc;text-align:left">'+(tipo==='env'?'Impacto Ambiental':'Risco / Consequência')+'</th>'
+      + '<th style="padding:8px;border:1px solid #ccc;text-align:center">F</th>'
+      + '<th style="padding:8px;border:1px solid #ccc;text-align:center">P</th>'
+      + '<th style="padding:8px;border:1px solid #ccc;text-align:center">S</th>'
+      + '<th style="padding:8px;border:1px solid #ccc;text-align:center">A</th>'
+      + '<th style="padding:8px;border:1px solid #ccc;text-align:center">Score</th>'
+      + '<th style="padding:8px;border:1px solid #ccc;text-align:center">Sig.</th>'
+      + '</tr></thead><tbody>'
+      + rows.map(function(r, i) {
+          var bg = i%2===0 ? '#fff' : '#f9f9f9';
+          var sigColor = r.sig==='S' ? '#D97706' : '#16A34A';
+          return '<tr style="background:'+bg+'">'
+            + '<td style="padding:7px 8px;border:1px solid #ddd">'+esc(r.proc||'')+'</td>'
+            + '<td style="padding:7px 8px;border:1px solid #ddd;font-weight:500">'+esc(r.asp||'')+'</td>'
+            + '<td style="padding:7px 8px;border:1px solid #ddd;color:#555">'+esc(r.imp||r.risk||'')+'</td>'
+            + '<td style="padding:7px 8px;border:1px solid #ddd;text-align:center">'+(r.freq||'—')+'</td>'
+            + '<td style="padding:7px 8px;border:1px solid #ddd;text-align:center">'+(r.prob||'—')+'</td>'
+            + '<td style="padding:7px 8px;border:1px solid #ddd;text-align:center">'+(r.sev||'—')+'</td>'
+            + '<td style="padding:7px 8px;border:1px solid #ddd;text-align:center">'+(r.abrang||'—')+'</td>'
+            + '<td style="padding:7px 8px;border:1px solid #ddd;text-align:center;font-weight:700">'+(r.score||'—')+'</td>'
+            + '<td style="padding:7px 8px;border:1px solid #ddd;text-align:center;color:'+sigColor+';font-weight:700">'+(r.sig==='S'?'⚠️ Sim':'✅ Não')+'</td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table>';
+  }
+
+  var win = window.open('','_blank');
+  win.document.write('<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">'
+    + '<title>Aspectos & Perigos — '+esc(org)+'</title>'
+    + '<style>body{font-family:Arial,sans-serif;padding:30px;font-size:13px;color:#111}'
+    + 'h1{font-size:18px;margin-bottom:4px}h2{font-size:14px;color:#0F766E;margin:20px 0 10px}'
+    + '@media print{button{display:none}}</style></head><body>'
+    + '<button onclick="window.print()" style="margin-bottom:20px;padding:8px 18px;background:#0F766E;color:#fff;border:none;border-radius:6px;cursor:pointer">🖨️ Imprimir / Salvar PDF</button>'
+    + '<h1>Levantamento de Aspectos & Perigos</h1>'
+    + '<p style="color:#666;font-size:12px;margin-bottom:20px">'+esc(org)+' · '+normas.join(' + ')+' · Cláusula 6.1.2 · Emitido em '+new Date().toLocaleDateString('pt-BR')+'</p>'
+    + (rows14.length ? '<h2>🌿 Aspectos & Impactos Ambientais — ISO 14001</h2>' + buildTable(rows14,'env') : '')
+    + (rows45.length ? '<h2>⛑️ Perigos & Riscos de SST — ISO 45001</h2>' + buildTable(rows45,'sst') : '')
+    + '<hr style="margin:20px 0;border-color:#eee"><p style="font-size:11px;color:#999">Score = F × P × S × A · Significativo: Score ≥ 50 · Escala: 1–625</p>'
+    + '</body></html>');
+  win.document.close();
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // IMPORTAR JSON DO FORMULÁRIO DE CAMPO STANDALONE
