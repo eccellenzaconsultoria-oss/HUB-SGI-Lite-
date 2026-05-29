@@ -789,6 +789,75 @@ input:focus, textarea:focus, select:focus {
 
   </div>
 
+
+  <!-- ═══ SELETOR INTELIGENTE DE ASPECTOS ═══ -->
+  <div id="ap-seletor" style="background:var(--card-2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text)">🎯 Seletor Inteligente de Aspectos</div>
+        <div style="font-size:12px;color:var(--text-soft);margin-top:2px">Selecione a área e processo — os aspectos aparecem automaticamente</div>
+      </div>
+      <button class="btn btn-sm" onclick="document.getElementById('ap-seletor').style.display='none'" style="color:var(--text-muted)">✕ Ocultar</button>
+    </div>
+
+    <!-- Linha 1: Área + Processo + Condição -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 180px;gap:12px;margin-bottom:16px">
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--text-soft);display:block;margin-bottom:4px">ÁREA</label>
+        <select id="sel-area" onchange="onAreaChange()" style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-size:13px">
+          <option value="">Selecione a área...</option>
+          <option>COQUERIA</option>
+          <option>SINTERIZAÇÃO</option>
+          <option>ALTO-FORNO</option>
+          <option>ACIARIA</option>
+          <option>LAMINAÇÃO</option>
+          <option>UTILIDADES</option>
+          <option>MANUTENÇÃO</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--text-soft);display:block;margin-bottom:4px">PROCESSO</label>
+        <select id="sel-processo" onchange="onProcessoChange()" style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-size:13px" disabled>
+          <option value="">Selecione o processo...</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:600;color:var(--text-soft);display:block;margin-bottom:4px">CONDIÇÃO</label>
+        <select id="sel-condicao" onchange="onCondicaoChange()" style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-size:13px" disabled>
+          <option value="Normal">Normal</option>
+          <option value="Anormal">Anormal</option>
+          <option value="Emergência">Emergência</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Lista de aspectos pré-definidos -->
+    <div id="ap-sugestoes" style="display:none">
+      <div style="font-size:11px;font-weight:700;color:var(--text-soft);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px">
+        Aspectos identificados — marque os que se aplicam:
+      </div>
+      <div id="ap-sugestoes-lista" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
+        <button class="btn btn-g btn-sm" onclick="incluirSelecionados()" id="btn-incluir-sel">
+          ✅ Incluir selecionados na tabela
+        </button>
+        <button class="btn btn-sm" onclick="selecionarTodos()">Selecionar todos</button>
+        <button class="btn btn-sm" onclick="deselecionarTodos()">Limpar seleção</button>
+        <span id="sel-counter" style="font-size:12px;color:var(--text-muted);margin-left:4px"></span>
+      </div>
+    </div>
+
+    <div id="ap-sugestoes-empty" style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;display:none">
+      Nenhum aspecto cadastrado para esta condição neste processo.
+    </div>
+  </div>
+
+  <!-- Botão para reabrir seletor -->
+  <div id="ap-seletor-btn" style="display:none;margin-bottom:12px">
+    <button class="btn btn-sm" onclick="document.getElementById('ap-seletor').style.display='block';document.getElementById('ap-seletor-btn').style.display='none'">
+      🎯 Abrir Seletor Inteligente
+    </button>
+  </div>
   <!-- FILTROS E AÇÕES -->
   <div class="flex fbet" style="margin-bottom:12px">
     <div class="flex" style="gap:6px">
@@ -1281,6 +1350,181 @@ window.toggleDarkMode = function() {
   root.setAttribute('data-theme', theme);
   try { localStorage.setItem('sgi-theme', theme); } catch(e) {}
 };
+</script>
+<script>
+
+// ═══════════════════════════════════════════════════════════
+// SELETOR INTELIGENTE DE ASPECTOS — Base ArcelorMittal Tubarão
+// ═══════════════════════════════════════════════════════════
+var BASE_ASPECTOS = {"areas":{"COQUERIA":{"descricao":"Coqueria - Transformação de carvão em coque","processos":{"Carregamento de Carvão":{"condicoes":{"Normal":[{"id":"COQ001","aspecto":"Emissão de particulado","impacto":"Alteração da qualidade do ar e contaminação respiratória","tipo":"Ar","controles_sugeridos":"Filtros de manga, Capelas de exaustão, Monitoramento contínuo"},{"id":"COQ002","aspecto":"Emissão de gases (SOx, NOx)","impacto":"Poluição atmosférica, chuva ácida e contribuição ao aquecimento global","tipo":"Ar","controles_sugeridos":"Scrubbers, Monitoramento de emissões, Manutenção preventiva"},{"id":"COQ003","aspecto":"Poeira de carvão","impacto":"Contaminação do solo, água e bioacumulação em organismos","tipo":"Solo","controles_sugeridos":"Cobertura de pilhas, Limpeza regular, Gestão de resíduos"},{"id":"COQ004","aspecto":"Ruído de operação","impacto":"Incômodo sonoro e impacto na saúde ocupacional","tipo":"Ruído","controles_sugeridos":"Barreiras acústicas, EPIs, Manutenção de equipamentos"},{"id":"COQ005","aspecto":"Consumo de energia","impacto":"Depleção de recursos energéticos e contribuição ao aquecimento global","tipo":"Recurso","controles_sugeridos":"Otimização de processos, Uso de energias renováveis, Monitoramento"}],"Anormal":[{"id":"COQ006","aspecto":"Vazamento de carvão","impacto":"Contaminação do solo e água subterrânea","tipo":"Solo","controles_sugeridos":"Contenção de emergência, Limpeza imediata, Relatório de incidente"},{"id":"COQ007","aspecto":"Emissão descontrolada de gases","impacto":"Poluição atmosférica severa e risco ocupacional","tipo":"Ar","controles_sugeridos":"Parada de emergência, Ventilação forçada, Evacuação de pessoal"}],"Emergência":[{"id":"COQ008","aspecto":"Incêndio em pilha de carvão","impacto":"Emissão massiva de gases tóxicos, fumaça e contribuição significativa ao aquecimento global","tipo":"Ar","controles_sugeridos":"Sistema de detecção, Brigada de incêndio, Plano de evacuação, Monitoramento de temperatura"},{"id":"COQ009","aspecto":"Explosão de gases","impacto":"Lesões graves, morte e contaminação ambiental severa","tipo":"Ar","controles_sugeridos":"Ventilação adequada, Monitoramento de concentração de gases, Equipamentos à prova de explosão"}]}},"Coqueificação":{"condicoes":{"Normal":[{"id":"COQ010","aspecto":"Emissão de gases (CO, CO2, CH4)","impacto":"Efeito estufa, aquecimento global e risco ocupacional","tipo":"Ar","controles_sugeridos":"Captura de gases, Queimadores, Monitoramento de concentração"},{"id":"COQ011","aspecto":"Vapores de alcatrão","impacto":"Poluição do ar, toxicidade e risco ocupacional","tipo":"Ar","controles_sugeridos":"Condensadores, Filtros, Ventilação localizada"},{"id":"COQ012","aspecto":"Efluentes líquidos","impacto":"Contaminação hídrica e ecossistemas aquáticos","tipo":"Água","controles_sugeridos":"Tratamento de efluentes, Monitoramento de qualidade, Reutilização"},{"id":"COQ013","aspecto":"Resíduos sólidos (alcatrão)","impacto":"Contaminação do solo e risco de lixiviação","tipo":"Resíduo","controles_sugeridos":"Contenção adequada, Reciclagem, Disposição final controlada"}],"Anormal":[{"id":"COQ014","aspecto":"Derramamento de alcatrão","impacto":"Contaminação do solo e água","tipo":"Solo","controles_sugeridos":"Diques de contenção, Absorventes, Limpeza imediata"}],"Emergência":[{"id":"COQ015","aspecto":"Vazamento massivo de gases tóxicos","impacto":"Risco crítico à vida e contaminação ambiental severa","tipo":"Ar","controles_sugeridos":"Parada de emergência, Evacuação, Respiradores, Monitoramento contínuo"}]}},"Resfriamento de Coque":{"condicoes":{"Normal":[{"id":"COQ016","aspecto":"Consumo de água","impacto":"Depleção de recursos hídricos e impacto em mudanças climáticas","tipo":"Recurso","controles_sugeridos":"Reutilização de água, Monitoramento de consumo, Otimização"},{"id":"COQ017","aspecto":"Efluentes com temperatura elevada","impacto":"Alteração térmica de corpos hídricos e impacto em ecossistemas","tipo":"Água","controles_sugeridos":"Resfriadores, Monitoramento de temperatura, Tratamento"},{"id":"COQ018","aspecto":"Emissão de vapor","impacto":"Alteração da qualidade do ar e contribuição ao efeito estufa","tipo":"Ar","controles_sugeridos":"Condensadores, Capelas de exaustão, Monitoramento"}],"Emergência":[{"id":"COQ019","aspecto":"Falha no sistema de resfriamento","impacto":"Superaquecimento, incêndio potencial e emissões massivas","tipo":"Ar","controles_sugeridos":"Sistemas de backup, Alarmes de temperatura, Manutenção preventiva"}]}}}},"SINTERIZAÇÃO":{"descricao":"Sinterização - Aglomeração de minério de ferro","processos":{"Preparação de Matérias-Primas":{"condicoes":{"Normal":[{"id":"SIN001","aspecto":"Emissão de particulado","impacto":"Alteração da qualidade do ar e contaminação respiratória","tipo":"Ar","controles_sugeridos":"Filtros de manga, Capelas, Monitoramento"},{"id":"SIN002","aspecto":"Poeira de minério","impacto":"Contaminação do solo e risco ocupacional","tipo":"Solo","controles_sugeridos":"Cobertura de pilhas, Limpeza, Gestão de resíduos"},{"id":"SIN003","aspecto":"Ruído de moagem","impacto":"Incômodo sonoro e impacto na saúde ocupacional","tipo":"Ruído","controles_sugeridos":"Barreiras acústicas, EPIs, Manutenção"},{"id":"SIN004","aspecto":"Consumo de energia","impacto":"Depleção de recursos energéticos e aquecimento global","tipo":"Recurso","controles_sugeridos":"Otimização, Energias renováveis, Monitoramento"}],"Emergência":[{"id":"SIN005","aspecto":"Colapso de pilha de minério","impacto":"Liberação massiva de poeira e contaminação ambiental","tipo":"Ar","controles_sugeridos":"Estruturas estáveis, Monitoramento, Plano de contingência"}]}},"Queima de Sínter":{"condicoes":{"Normal":[{"id":"SIN006","aspecto":"Emissão de gases (SOx, NOx, CO2)","impacto":"Poluição atmosférica, chuva ácida e efeito estufa","tipo":"Ar","controles_sugeridos":"Scrubbers, Monitoramento, Manutenção"},{"id":"SIN007","aspecto":"Emissão de metais pesados","impacto":"Contaminação do ar, solo e bioacumulação","tipo":"Ar","controles_sugeridos":"Filtros especiais, Monitoramento, Tratamento"},{"id":"SIN008","aspecto":"Escórias e resíduos","impacto":"Geração de resíduos sólidos e contaminação potencial","tipo":"Resíduo","controles_sugeridos":"Reciclagem, Disposição controlada, Monitoramento"},{"id":"SIN009","aspecto":"Consumo de combustível","impacto":"Depleção de recursos naturais e aquecimento global","tipo":"Recurso","controles_sugeridos":"Otimização, Combustíveis alternativos, Monitoramento"}],"Emergência":[{"id":"SIN010","aspecto":"Falha no sistema de queimadores","impacto":"Emissões descontroladas e risco de explosão","tipo":"Ar","controles_sugeridos":"Sistemas de segurança, Parada de emergência, Manutenção preventiva"}]}},"Resfriamento de Sínter":{"condicoes":{"Normal":[{"id":"SIN011","aspecto":"Consumo de água","impacto":"Depleção de recursos hídricos e impacto em mudanças climáticas","tipo":"Recurso","controles_sugeridos":"Reutilização, Monitoramento, Otimização"},{"id":"SIN012","aspecto":"Efluentes com sólidos suspensos","impacto":"Contaminação hídrica e impacto em ecossistemas","tipo":"Água","controles_sugeridos":"Tratamento, Sedimentação, Monitoramento"}]}}}},"ALTO-FORNO":{"descricao":"Alto-Forno - Redução de minério de ferro","processos":{"Carregamento":{"condicoes":{"Normal":[{"id":"AF001","aspecto":"Emissão de particulado","impacto":"Alteração da qualidade do ar","tipo":"Ar","controles_sugeridos":"Filtros, Capelas, Monitoramento"},{"id":"AF002","aspecto":"Poeira de minério e coque","impacto":"Contaminação do solo","tipo":"Solo","controles_sugeridos":"Cobertura, Limpeza, Gestão"}]}},"Redução":{"condicoes":{"Normal":[{"id":"AF003","aspecto":"Emissão de GAF (gases de alto-forno)","impacto":"Poluição atmosférica","tipo":"Ar","controles_sugeridos":"Captura de gases, Queimadores, Monitoramento"},{"id":"AF004","aspecto":"Emissão de CO2","impacto":"Efeito estufa e aquecimento global","tipo":"Ar","controles_sugeridos":"Captura de carbono, Otimização, Monitoramento"},{"id":"AF005","aspecto":"Consumo de coque","impacto":"Depleção de recursos naturais e aquecimento global","tipo":"Recurso","controles_sugeridos":"Otimização, Combustíveis alternativos, Monitoramento"},{"id":"AF006","aspecto":"Consumo de água","impacto":"Depleção de recursos hídricos","tipo":"Recurso","controles_sugeridos":"Reutilização, Monitoramento, Otimização"}],"Emergência":[{"id":"AF007","aspecto":"Explosão de gases no alto-forno","impacto":"Risco crítico à vida e contaminação ambiental severa","tipo":"Ar","controles_sugeridos":"Monitoramento de pressão, Válvulas de segurança, Plano de evacuação"}]}},"Vazamento de Ferro":{"condicoes":{"Normal":[{"id":"AF008","aspecto":"Emissão de fumos metálicos","impacto":"Toxicidade e poluição do ar","tipo":"Ar","controles_sugeridos":"Filtros especiais, Ventilação, Monitoramento"},{"id":"AF009","aspecto":"Escória líquida","impacto":"Risco de queimadura e contaminação","tipo":"Ocupacional","controles_sugeridos":"EPIs, Barreiras, Treinamento"},{"id":"AF010","aspecto":"Efluentes com metais","impacto":"Contaminação hídrica","tipo":"Água","controles_sugeridos":"Tratamento, Monitoramento, Reutilização"}],"Emergência":[{"id":"AF011","aspecto":"Transbordamento de ferro líquido","impacto":"Incêndio, queimaduras e contaminação ambiental","tipo":"Ocupacional","controles_sugeridos":"Sistemas de contenção, Alarmes, Treinamento de emergência"}]}}}},"ACIARIA":{"descricao":"Aciaria - Refino de ferro em aço","processos":{"Carregamento de Sucata":{"condicoes":{"Normal":[{"id":"AC001","aspecto":"Emissão de particulado","impacto":"Alteração da qualidade do ar","tipo":"Ar","controles_sugeridos":"Filtros, Capelas, Monitoramento"},{"id":"AC002","aspecto":"Ruído de operação","impacto":"Incômodo sonoro","tipo":"Ruído","controles_sugeridos":"Barreiras acústicas, EPIs, Manutenção"}]}},"Refino":{"condicoes":{"Normal":[{"id":"AC003","aspecto":"Emissão de fumos metálicos","impacto":"Toxicidade e poluição do ar","tipo":"Ar","controles_sugeridos":"Filtros especiais, Ventilação, Monitoramento"},{"id":"AC004","aspecto":"Emissão de gases (CO, CO2)","impacto":"Poluição atmosférica e efeito estufa","tipo":"Ar","controles_sugeridos":"Captura, Queimadores, Monitoramento"},{"id":"AC005","aspecto":"Poeira de refratário","impacto":"Contaminação do ar","tipo":"Ar","controles_sugeridos":"Filtros, Ventilação, Monitoramento"},{"id":"AC006","aspecto":"Escória de refino","impacto":"Geração de resíduos sólidos","tipo":"Resíduo","controles_sugeridos":"Reciclagem, Disposição controlada, Monitoramento"}],"Emergência":[{"id":"AC007","aspecto":"Transbordamento de aço líquido","impacto":"Incêndio, queimaduras e contaminação ambiental","tipo":"Ocupacional","controles_sugeridos":"Sistemas de contenção, Alarmes, Treinamento"}]}},"Vazamento de Aço":{"condicoes":{"Normal":[{"id":"AC008","aspecto":"Aço líquido","impacto":"Risco de queimadura","tipo":"Ocupacional","controles_sugeridos":"EPIs, Barreiras, Treinamento"},{"id":"AC009","aspecto":"Emissão de vapor","impacto":"Alteração da qualidade do ar","tipo":"Ar","controles_sugeridos":"Ventilação, Capelas, Monitoramento"}]}}}},"LAMINAÇÃO":{"descricao":"Laminação - Conformação do aço","processos":{"Aquecimento":{"condicoes":{"Normal":[{"id":"LAM001","aspecto":"Emissão de gases de combustão","impacto":"Poluição atmosférica","tipo":"Ar","controles_sugeridos":"Scrubbers, Monitoramento, Manutenção"},{"id":"LAM002","aspecto":"Consumo de combustível","impacto":"Depleção de recursos naturais e aquecimento global","tipo":"Recurso","controles_sugeridos":"Otimização, Combustíveis alternativos, Monitoramento"},{"id":"LAM003","aspecto":"Emissão de CO2","impacto":"Efeito estufa e aquecimento global","tipo":"Ar","controles_sugeridos":"Captura de carbono, Otimização, Monitoramento"}],"Emergência":[{"id":"LAM004","aspecto":"Falha no sistema de combustão","impacto":"Emissões descontroladas e risco de explosão","tipo":"Ar","controles_sugeridos":"Sistemas de segurança, Parada de emergência, Manutenção"}]}},"Laminação":{"condicoes":{"Normal":[{"id":"LAM005","aspecto":"Emissão de particulado","impacto":"Alteração da qualidade do ar","tipo":"Ar","controles_sugeridos":"Filtros, Capelas, Monitoramento"},{"id":"LAM006","aspecto":"Ruído de operação","impacto":"Incômodo sonoro","tipo":"Ruído","controles_sugeridos":"Barreiras acústicas, EPIs, Manutenção"},{"id":"LAM007","aspecto":"Consumo de energia","impacto":"Depleção de recursos energéticos e aquecimento global","tipo":"Recurso","controles_sugeridos":"Otimização, Energias renováveis, Monitoramento"}]}},"Resfriamento":{"condicoes":{"Normal":[{"id":"LAM008","aspecto":"Consumo de água","impacto":"Depleção de recursos hídricos","tipo":"Recurso","controles_sugeridos":"Reutilização, Monitoramento, Otimização"},{"id":"LAM009","aspecto":"Efluentes com óleos","impacto":"Contaminação hídrica","tipo":"Água","controles_sugeridos":"Tratamento, Separadores, Monitoramento"},{"id":"LAM010","aspecto":"Efluentes com sólidos suspensos","impacto":"Contaminação hídrica","tipo":"Água","controles_sugeridos":"Tratamento, Sedimentação, Monitoramento"}]}}}},"UTILIDADES":{"descricao":"Utilidades - Geração de energia e vapor","processos":{"Caldeiras":{"condicoes":{"Normal":[{"id":"UT001","aspecto":"Emissão de gases de combustão (SOx, NOx)","impacto":"Poluição atmosférica, chuva ácida e aquecimento global","tipo":"Ar","controles_sugeridos":"Scrubbers, Monitoramento, Manutenção"},{"id":"UT002","aspecto":"Emissão de particulado","impacto":"Alteração da qualidade do ar","tipo":"Ar","controles_sugeridos":"Filtros, Capelas, Monitoramento"},{"id":"UT003","aspecto":"Consumo de combustível","impacto":"Depleção de recursos naturais e aquecimento global","tipo":"Recurso","controles_sugeridos":"Otimização, Combustíveis alternativos, Monitoramento"},{"id":"UT004","aspecto":"Cinzas de combustão","impacto":"Geração de resíduos sólidos","tipo":"Resíduo","controles_sugeridos":"Reciclagem, Disposição controlada, Monitoramento"}],"Emergência":[{"id":"UT005","aspecto":"Explosão de caldeira","impacto":"Risco crítico à vida e contaminação ambiental severa","tipo":"Ocupacional","controles_sugeridos":"Válvulas de segurança, Monitoramento de pressão, Inspeções regulares"}]}},"Compressores":{"condicoes":{"Normal":[{"id":"UT006","aspecto":"Consumo de energia","impacto":"Depleção de recursos energéticos e aquecimento global","tipo":"Recurso","controles_sugeridos":"Otimização, Energias renováveis, Monitoramento"},{"id":"UT007","aspecto":"Ruído de operação","impacto":"Incômodo sonoro","tipo":"Ruído","controles_sugeridos":"Barreiras acústicas, EPIs, Manutenção"},{"id":"UT008","aspecto":"Vazamento de óleo","impacto":"Contaminação do solo","tipo":"Solo","controles_sugeridos":"Bandejas de contenção, Manutenção, Monitoramento"}]}},"Tratamento de Água":{"condicoes":{"Normal":[{"id":"UT009","aspecto":"Consumo de água","impacto":"Depleção de recursos hídricos","tipo":"Recurso","controles_sugeridos":"Reutilização, Monitoramento, Otimização"},{"id":"UT010","aspecto":"Lodo de tratamento","impacto":"Geração de resíduos sólidos","tipo":"Resíduo","controles_sugeridos":"Reciclagem, Disposição controlada, Monitoramento"},{"id":"UT011","aspecto":"Efluentes tratados","impacto":"Contaminação hídrica residual","tipo":"Água","controles_sugeridos":"Monitoramento, Tratamento adicional, Reutilização"}]}}}},"MANUTENÇÃO":{"descricao":"Manutenção - Atividades de manutenção","processos":{"Limpeza e Pintura":{"condicoes":{"Normal":[{"id":"MAN001","aspecto":"Emissão de VOCs (Compostos Orgânicos Voláteis)","impacto":"Poluição do ar e contribuição ao efeito estufa","tipo":"Ar","controles_sugeridos":"Ventilação, Capelas, Monitoramento"},{"id":"MAN002","aspecto":"Resíduos de tinta","impacto":"Contaminação do solo","tipo":"Resíduo","controles_sugeridos":"Contenção, Reciclagem, Disposição controlada"},{"id":"MAN003","aspecto":"Efluentes com tinta","impacto":"Contaminação hídrica","tipo":"Água","controles_sugeridos":"Tratamento, Monitoramento, Reutilização"}]}},"Soldagem":{"condicoes":{"Normal":[{"id":"MAN004","aspecto":"Emissão de fumos de soldagem","impacto":"Toxicidade e poluição do ar","tipo":"Ar","controles_sugeridos":"Ventilação local, Capelas, Monitoramento"},{"id":"MAN005","aspecto":"Ruído de soldagem","impacto":"Incômodo sonoro","tipo":"Ruído","controles_sugeridos":"Barreiras acústicas, EPIs, Manutenção"},{"id":"MAN006","aspecto":"Radiação UV","impacto":"Risco ocupacional","tipo":"Ocupacional","controles_sugeridos":"EPIs, Barreiras, Treinamento"}]}},"Limpeza de Equipamentos":{"condicoes":{"Normal":[{"id":"MAN007","aspecto":"Efluentes com óleos e graxas","impacto":"Contaminação hídrica","tipo":"Água","controles_sugeridos":"Tratamento, Separadores, Monitoramento"},{"id":"MAN008","aspecto":"Resíduos de limpeza","impacto":"Geração de resíduos sólidos","tipo":"Resíduo","controles_sugeridos":"Reciclagem, Disposição controlada, Monitoramento"},{"id":"MAN009","aspecto":"Consumo de água","impacto":"Depleção de recursos hídricos","tipo":"Recurso","controles_sugeridos":"Reutilização, Monitoramento, Otimização"}]}}}}}}
+;
+
+function onAreaChange() {
+  var area = document.getElementById('sel-area').value;
+  var selProc = document.getElementById('sel-processo');
+  var selCond = document.getElementById('sel-condicao');
+  
+  selProc.innerHTML = '<option value="">Selecione o processo...</option>';
+  selProc.disabled = !area;
+  selCond.disabled = !area;
+  document.getElementById('ap-sugestoes').style.display = 'none';
+  document.getElementById('ap-sugestoes-empty').style.display = 'none';
+  
+  if (!area) return;
+  
+  var processos = BASE_ASPECTOS.areas[area] && BASE_ASPECTOS.areas[area].processos;
+  if (!processos) return;
+  
+  Object.keys(processos).forEach(function(proc) {
+    var opt = document.createElement('option');
+    opt.value = proc;
+    opt.textContent = proc;
+    selProc.appendChild(opt);
+  });
+}
+
+function onProcessoChange() {
+  var cond = document.getElementById('sel-condicao').value || 'Normal';
+  renderSugestoes();
+}
+
+function onCondicaoChange() {
+  renderSugestoes();
+}
+
+function renderSugestoes() {
+  var area     = document.getElementById('sel-area').value;
+  var processo = document.getElementById('sel-processo').value;
+  var cond     = document.getElementById('sel-condicao').value || 'Normal';
+  
+  var lista = document.getElementById('ap-sugestoes-lista');
+  var box   = document.getElementById('ap-sugestoes');
+  var empty = document.getElementById('ap-sugestoes-empty');
+  
+  if (!area || !processo) return;
+  
+  var aspectos = BASE_ASPECTOS.areas[area] &&
+                 BASE_ASPECTOS.areas[area].processos[processo] &&
+                 BASE_ASPECTOS.areas[area].processos[processo].condicoes[cond] || [];
+  
+  if (!aspectos.length) {
+    box.style.display   = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  
+  box.style.display   = 'block';
+  empty.style.display = 'none';
+  
+  // Tipo → badge color
+  var tipoCor = {
+    'Ar':     '#0ea5e9', 'Água':    '#06b6d4', 'Solo':    '#92400e',
+    'Resíduo':'#7c3aed', 'Ruído':   '#6b7280', 'Recurso': '#16a34a',
+    'Ocupacional':'#dc2626'
+  };
+  
+  lista.innerHTML = aspectos.map(function(a, i) {
+    var cor = tipoCor[a.tipo] || '#C9A45C';
+    return '<label style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;' +
+           'background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer;' +
+           'transition:all 0.15s" onmouseover="this.style.borderColor=\'#C9A45C\'" ' +
+           'onmouseout="if(!this.querySelector(\'input\').checked)this.style.borderColor=\'var(--border)\'">' +
+           '<input type="checkbox" value="' + i + '" onchange="updateSelCounter();' +
+           'this.closest(\'label\').style.borderColor=this.checked?\'#C9A45C\':\'var(--border)\';' +
+           'this.closest(\'label\').style.background=this.checked?\'rgba(201,164,92,0.08)\':\'var(--card)\'" ' +
+           'style="margin-top:2px;width:16px;height:16px;accent-color:#C9A45C;flex-shrink:0">' +
+           '<div style="flex:1">' +
+           '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
+           '<span style="font-size:13px;font-weight:600;color:var(--text)">' + a.aspecto + '</span>' +
+           '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;' +
+           'background:' + cor + '22;color:' + cor + ';border:1px solid ' + cor + '44">' + a.tipo + '</span>' +
+           '</div>' +
+           '<div style="font-size:12px;color:var(--text-soft);margin-bottom:4px">💥 ' + a.impacto + '</div>' +
+           '<div style="font-size:11px;color:var(--text-muted)">🛡️ ' + a.controles_sugeridos + '</div>' +
+           '</div></label>';
+  }).join('');
+  
+  updateSelCounter();
+}
+
+function updateSelCounter() {
+  var checks = document.querySelectorAll('#ap-sugestoes-lista input[type=checkbox]:checked');
+  var total  = document.querySelectorAll('#ap-sugestoes-lista input[type=checkbox]');
+  var el = document.getElementById('sel-counter');
+  if (el) el.textContent = checks.length + ' de ' + total.length + ' selecionados';
+}
+
+function selecionarTodos() {
+  document.querySelectorAll('#ap-sugestoes-lista input[type=checkbox]').forEach(function(cb) {
+    cb.checked = true;
+    cb.dispatchEvent(new Event('change'));
+  });
+  updateSelCounter();
+}
+
+function deselecionarTodos() {
+  document.querySelectorAll('#ap-sugestoes-lista input[type=checkbox]').forEach(function(cb) {
+    cb.checked = false;
+    cb.dispatchEvent(new Event('change'));
+  });
+  updateSelCounter();
+}
+
+function incluirSelecionados() {
+  var area     = document.getElementById('sel-area').value;
+  var processo = document.getElementById('sel-processo').value;
+  var cond     = document.getElementById('sel-condicao').value || 'Normal';
+  var aspectos = BASE_ASPECTOS.areas[area] &&
+                 BASE_ASPECTOS.areas[area].processos[processo] &&
+                 BASE_ASPECTOS.areas[area].processos[processo].condicoes[cond] || [];
+  
+  var selecionados = document.querySelectorAll('#ap-sugestoes-lista input[type=checkbox]:checked');
+  var count = 0;
+  
+  selecionados.forEach(function(cb) {
+    var idx = parseInt(cb.value);
+    var a   = aspectos[idx];
+    if (!a) return;
+    
+    // Add to S.apItems
+    if (!window.S) window.S = {};
+    if (!S.apItems) S.apItems = [];
+    
+    S.apItems.push({
+      type:    'env',
+      catCode: a.id || '',
+      proc:    processo,
+      asp:     a.aspecto,
+      imp:     a.impacto,
+      risk:    a.impacto,
+      tipo:    a.tipo,
+      cond:    cond.charAt(0),  // N/A/E
+      prob:    3, sev: 3,
+      score:   9,
+      cls:     'high',
+      sig:     'S',
+      sigCrit: 'Score ≥ 9',
+      activity: area + ' — ' + processo,
+      controles: a.controles_sugeridos,
+      fromBase: true
+    });
+    count++;
+  });
+  
+  if (count === 0) { alert('Selecione pelo menos um aspecto.'); return; }
+  
+  // Re-render table
+  if (typeof renderAP === 'function') renderAP();
+  
+  // Feedback
+  deselecionarTodos();
+  var btn = document.getElementById('btn-incluir-sel');
+  var orig = btn.textContent;
+  btn.textContent = '✅ ' + count + ' aspecto(s) incluído(s)!';
+  btn.style.background = '#16a34a';
+  setTimeout(function() { btn.textContent = orig; btn.style.background = ''; }, 2500);
+}
+
 </script>
 </body>
 </html>
