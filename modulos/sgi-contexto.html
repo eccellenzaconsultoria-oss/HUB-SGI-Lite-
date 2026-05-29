@@ -11,6 +11,49 @@
 <script>
 (function(){try{var s=localStorage.getItem('sgi-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s||(d?'dark':'light'));}catch(e){}})();
 </script>
+
+<style>
+/* Fix button visibility */
+.btn { color: var(--text) !important; }
+.btn[style*="background:var(--green)"],
+.btn[style*="background:var(--green-d)"],
+.btn[style*="background:var(--blue)"],
+.btn[style*="background:var(--blue-d)"],
+.btn[style*="background:var(--purple)"] {
+  color: #fff !important;
+}
+.btn[style*="color:#fff"] { color: #fff !important; }
+.btn[style*="color:var(--green-d)"] { color: var(--green-d) !important; }
+.btn[style*="color:var(--blue-d)"] { color: var(--blue-d) !important; }
+.btn[style*="color:var(--teal)"] { color: var(--teal) !important; }
+.btn[style*="color:var(--red)"] { color: var(--red) !important; }
+.btn-g { 
+  background: var(--gold) !important; 
+  color: var(--brand-dark) !important;
+  font-weight: 600 !important;
+}
+/* Fix label buttons (import) */
+label.btn { color: #fff !important; }
+</style>
+<style>
+/* Button color overrides for inline-styled buttons */
+.btn { font-family: var(--ff-body) !important; }
+button[style*="color:#fff"], label[style*="color:#fff"] { color: #fff !important; }
+button[style*="background:#2d8a4e"] { color: #fff !important; }
+button[style*="background:#1a5c32"] { color: #fff !important; }
+button[style*="background:#1a6b9e"] { color: #fff !important; }
+button[style*="background:#155a87"] { color: #fff !important; }
+button[style*="background:#7C3AED"] { color: #fff !important; }
+label[style*="background:#7C3AED"] { color: #fff !important; }
+label[style*="background:#1a5c32"] { color: #fff !important; }
+label[style*="background:#155a87"] { color: #fff !important; }
+/* Section body padding */
+.sec.on > div:not(.ph) { padding: 0 32px; }
+.sec.on > div:not(.ph) + div { margin-top: 16px; }
+/* Seletor inteligente spacing */
+#ap-seletor { margin: 0 32px 20px !important; }
+#ap-seletor-reabrir { margin: 0 32px 12px !important; }
+</style>
 </head>
 <body>
 <header>
@@ -211,7 +254,7 @@
       <div class="ct2" style="margin-bottom:0">📊 Análise SWOT do Contexto SGI — apenas fatores relevantes</div>
       <div style="display:flex;align-items:center;gap:8px">
         <span id="swot-rev-date" style="font-size:11px;color:var(--text2)"></span>
-        <button class="btn btn-sm" style="background:var(--green);color:#fff;border-color:var(--green);font-weight:500" onclick="finalizeSWOT()">✅ Finalizar revisão</button>
+        <button class="btn btn-sm" style="background:#2d8a4e;color:#fff!important;border-color:#2d8a4e;font-weight:600" onclick="finalizeSWOT()">✅ Finalizar revisão</button>
       </div>
     </div>
     <div class="swot">
@@ -231,7 +274,7 @@
     </div>
   </div>
   <div id="swot-suggest-btn"  style="display:none;margin-top:12px">
-      <button class="btn btn-sm" style="background:var(--blue);color:#fff;border-color:var(--blue);font-weight:500" onclick="goTo('s3');generateROFromSWOT()">
+      <button class="btn btn-sm" style="background:#1a6b9e;color:#fff!important;border-color:#1a6b9e;font-weight:600" onclick="goTo('s3');generateROFromSWOT()">
         ⚡ Gerar Riscos & Oportunidades a partir desta SWOT →
       </button>
     </div>
@@ -584,13 +627,13 @@
         Inclui: <strong>Atividade/Produto/Serviço · Ciclo de vida · Aspecto · Impacto · P × S · Significância</strong>
       </p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-        <button class="btn btn-sm" style="background:var(--green);color:#fff;border-color:var(--green);font-weight:500" onclick="exportCSV14001()">⬇️ Baixar planilha 14001 (.xlsx)</button>
-        <button class="btn btn-sm" style="border-color:var(--teal);color:var(--teal);font-weight:500" onclick="exportHTMLAP()">🌐 Gerar HTML para auditoria</button>
-        <button class="btn btn-sm" style="background:var(--green-d);color:#fff;border-color:var(--green-d);font-weight:500" onclick="openCampo14001()">📋 Formulário de campo — 14001</button>
+        <button class="btn btn-sm" style="background:#2d8a4e;color:#fff!important;border-color:#2d8a4e;font-weight:600" onclick="exportCSV14001()">⬇️ Baixar planilha 14001 (.xlsx)</button>
+        <button class="btn btn-sm" style="border-color:#0F766E;color:#0F766E;font-weight:600;background:rgba(15,118,110,0.08)" onclick="exportHTMLAP()">🌐 Gerar HTML para auditoria</button>
+        <button class="btn btn-sm" style="background:#1a5c32;color:#fff!important;border-color:#1a5c32;font-weight:600" onclick="openCampo14001()">📋 Formulário de campo — 14001</button>
       </div>
       <div style="border-top:1px dashed #99F6E4;padding-top:8px;margin-top:4px">
         <div style="font-size:11px;font-weight:600;color:var(--green-d);margin-bottom:4px">📥 Importar após preenchimento:</div>
-        <label class="btn btn-sm" style="background:var(--purple);color:#fff;border-color:var(--purple);font-weight:500;cursor:pointer;display:inline-flex">
+        <label class="btn btn-sm" style="background:#7C3AED;color:#fff!important;border-color:#7C3AED;font-weight:600;cursor:pointer;display:inline-flex">
           📱 Importar do formulário de campo (.json)
           <input type="file" accept=".json" style="display:none" onchange="importCampoJSON(this)">
         </label>
@@ -609,8 +652,8 @@
         Inclui: <strong>Atividade/Produto/Serviço · Perigo · Risco · P × S · Grau · Hierarquia de controles</strong>
       </p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-        <button class="btn btn-sm" style="background:var(--blue);color:#fff;border-color:var(--blue);font-weight:500" onclick="exportCSV45001()">⬇️ Baixar planilha 45001 (.xlsx)</button>
-        <button class="btn btn-sm" style="background:var(--blue-d);color:#fff;border-color:var(--blue-d);font-weight:500" onclick="openCampo45001()">📋 Formulário de campo — 45001</button>
+        <button class="btn btn-sm" style="background:#1a6b9e;color:#fff!important;border-color:#1a6b9e;font-weight:600" onclick="exportCSV45001()">⬇️ Baixar planilha 45001 (.xlsx)</button>
+        <button class="btn btn-sm" style="background:#155a87;color:#fff!important;border-color:#155a87;font-weight:600" onclick="openCampo45001()">📋 Formulário de campo — 45001</button>
       </div>
       <div style="border-top:1px dashed #E5E0D8;padding-top:8px;margin-top:4px">
         <div style="font-size:11px;font-weight:600;color:var(--blue-d);margin-bottom:4px">📥 Importar após preenchimento:</div>
@@ -722,8 +765,8 @@
       Analisa automaticamente a SWOT (4.1), as Partes Interessadas selecionadas (4.2) e os Aspectos/Perigos classificados como críticos ou altos (6.1.2) e sugere riscos e oportunidades com rastreabilidade da origem normativa.
     </p>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-sm" style="background:var(--green);color:#fff;border-color:var(--green);font-weight:500" onclick="generateROFromSWOT()">🌿 Gerar a partir da SWOT (4.1)</button>
-      <button class="btn btn-sm" style="background:var(--blue);color:#fff;border-color:var(--blue);font-weight:500" onclick="generateROFromPI()">👥 Gerar a partir das Partes Interessadas (4.2)</button>
+      <button class="btn btn-sm" style="background:#2d8a4e;color:#fff!important;border-color:#2d8a4e;font-weight:600" onclick="generateROFromSWOT()">🌿 Gerar a partir da SWOT (4.1)</button>
+      <button class="btn btn-sm" style="background:#1a6b9e;color:#fff!important;border-color:#1a6b9e;font-weight:600" onclick="generateROFromPI()">👥 Gerar a partir das Partes Interessadas (4.2)</button>
       <button class="btn btn-sm" style="background:var(--amber);color:#fff;border-color:var(--amber);font-weight:500" onclick="generateROFromAP()">⚠️ Gerar a partir dos Aspectos & Perigos (6.1.2)</button>
       <button class="btn btn-sm" onclick="clearRO()" style="color:var(--red);border-color:var(--red)">🗑️ Limpar todos</button>
     </div>
@@ -980,7 +1023,7 @@
     <div style="font-size:12px;font-weight:700;color:var(--blue-d);margin-bottom:6px">⚡ Sugestão automática baseada nos Riscos & Oportunidades</div>
     <p style="font-size:12px;color:var(--blue-d);margin-bottom:10px">Os itens abaixo foram identificados na cláusula 6.1.1 como altos ou críticos e ainda não possuem objetivo associado. Deseja criar objetivos a partir deles?</p>
     <div id="obj-ro-list" style="margin-bottom:10px"></div>
-    <button class="btn btn-sm" style="background:var(--blue);color:#fff;border-color:var(--blue);font-weight:500" onclick="importROasObj()">⚡ Criar objetivos a partir dos R&O selecionados</button>
+    <button class="btn btn-sm" style="background:#1a6b9e;color:#fff!important;border-color:#1a6b9e;font-weight:600" onclick="importROasObj()">⚡ Criar objetivos a partir dos R&O selecionados</button>
   </div>
 
   <!-- Lista de objetivos -->
@@ -1121,7 +1164,7 @@
       <div class="ac-section-title">📄 Ata da Análise Crítica pela Direção</div>
       <div class="ata-wrap" id="ac-ata-content"></div>
       <div style="margin-top:14px;display:flex;gap:10px">
-        <button class="btn" style="background:var(--green);color:#fff;border-color:var(--green);font-weight:500" onclick="printAta()">🖨️ Imprimir / PDF</button>
+        <button class="btn" style="background:#2d8a4e;color:#fff!important;border-color:#2d8a4e;font-weight:600" onclick="printAta()">🖨️ Imprimir / PDF</button>
         <button class="btn btn-sm" onclick="exportAta()">⬇️ Exportar .txt</button>
       </div>
     </div>
